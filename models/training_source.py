@@ -1,0 +1,12 @@
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from .base import Base
+
+
+class TrainingSource(Base):
+    __tablename__ = "training_source"
+
+    id_source: Mapped[int] = mapped_column(primary_key=True)
+    name_source: Mapped[str | None] = mapped_column(String(50))
+
+    provided_trainings = relationship("Provide", back_populates="source")

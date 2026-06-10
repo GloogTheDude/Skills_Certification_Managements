@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Environment variables
+.env
+
+# VSCode
+.vscode/
+
+# JetBrains
+.idea/
+
+# pytest
+.pytest_cache/
+
+# SQLAlchemy / Alembic
+alembic/versions/__pycache__/
+
+# OS
+.DS_Store
