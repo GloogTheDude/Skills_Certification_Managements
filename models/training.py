@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import Date, ForeignKey, String
+from sqlalchemy import Date, ForeignKey, String,Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -16,6 +16,13 @@ class Training(Base):
 
     start_: Mapped[date | None] = mapped_column(Date)
     end_: Mapped[date | None] = mapped_column(Date)
+
+    is_deleted: Mapped[bool] = mapped_column(
+                                            Boolean,
+                                            default=False,
+                                            server_default="false",
+                                            nullable=False
+                                        )
 
     domaine = relationship("Domaine", back_populates="trainings")
     requests = relationship("TrainingRequest", back_populates="training")

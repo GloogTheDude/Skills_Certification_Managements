@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from sqlalchemy import ForeignKey, Numeric
+from sqlalchemy import ForeignKey, Numeric, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -14,6 +14,13 @@ class Provide(Base):
 
     cost_hour: Mapped[Decimal | None] = mapped_column(Numeric(15, 2))
     duration_hours: Mapped[Decimal | None] = mapped_column(Numeric(15, 2))
+
+    is_active: Mapped[bool] = mapped_column(
+                                            Boolean,
+                                            default=True,
+                                            server_default="true",
+                                            nullable=False
+                                        )
 
     training = relationship("Training", back_populates="providers")
     source = relationship("TrainingSource", back_populates="provided_trainings")

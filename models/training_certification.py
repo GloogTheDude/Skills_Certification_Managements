@@ -12,5 +12,7 @@ class TrainingCertification(Base):
     )
     id_training: Mapped[int] = mapped_column(ForeignKey("training.id_training"), primary_key=True)
 
+
+
     certification = relationship("Certification", back_populates="training_links")
     training = relationship("Training", back_populates="certification_links")

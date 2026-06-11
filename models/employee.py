@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String,Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -12,6 +12,13 @@ class Employee(Base):
     last_name: Mapped[str | None] = mapped_column(String(50))
     hash_password: Mapped[str | None] = mapped_column(String(50))
     mail: Mapped[str | None] = mapped_column(String(50))
+    is_deleted: Mapped[bool] = mapped_column(
+                                    Boolean,
+                                    default=False,
+                                    server_default="false",
+                                    nullable=False
+                                )
+
 
     id_role: Mapped[int] = mapped_column(ForeignKey("role.id_role"))
     id_manager: Mapped[int | None] = mapped_column(

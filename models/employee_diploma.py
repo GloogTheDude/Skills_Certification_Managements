@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, String,Date
+from sqlalchemy import ForeignKey, String,Date, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from datetime import date
@@ -17,6 +17,13 @@ class EmployeeDiploma(Base):
     
     distinction: Mapped[str | None] = mapped_column(String(50))
     doc: Mapped[str | None] = mapped_column(String(50))
+
+    is_deleted: Mapped[bool] = mapped_column(
+                                            Boolean,
+                                            default=False,
+                                            server_default="false",
+                                            nullable=False
+                                        )
 
     employee = relationship("Employee", back_populates="diplomas")
     diploma = relationship("Diploma", back_populates="employees")
