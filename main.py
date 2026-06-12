@@ -2,7 +2,9 @@ from core.database import SessionLocal
 from db.repositories.employee_repository import EmployeeRepository
 from services.login_service import LoginService
 from controllers.login_controller import LoginController
-from menus.base_employee_menu import BaseEmployeeMenu
+from controllers.employee_controller import EmployeeController
+from db.repositories.skills_repository import SkillRepository
+from services.skill_service import SkillService
 
 
 def main():
@@ -10,6 +12,10 @@ def main():
     employee_repo = EmployeeRepository(session)
     login_serv = LoginService(employee_repo)
     login_control = LoginController(login_serv)
+    skill_repo = SkillRepository(session)
+    skill_service = SkillService(skill_repo)
+
+    
     mail = input("Mail: ")
     password = input("Password: ")
     
@@ -19,8 +25,8 @@ def main():
         role = employee.role.denomination_role 
         if role == "Employee":
             #print("employee menu under-construction")
-            m = BaseEmployeeMenu()
-            m.menu()
+            employee_controller = EmployeeController(employee,skill_service)
+            employee_controller.get_main_employee_menu()
         elif role == "Manager":
             print("manager menu under-construction")
         elif role == "HR":
