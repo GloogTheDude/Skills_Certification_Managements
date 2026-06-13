@@ -5,7 +5,8 @@ from controllers.login_controller import LoginController
 from controllers.employee_controller import EmployeeController
 from db.repositories.skills_repository import SkillRepository
 from services.skill_service import SkillService
-
+from services.certification_service import CertificationService
+from db.repositories.certification_repository import CertificationRepository
 
 def main():
     session = SessionLocal()
@@ -14,6 +15,8 @@ def main():
     login_control = LoginController(login_serv)
     skill_repo = SkillRepository(session)
     skill_service = SkillService(skill_repo)
+    certification_repository = CertificationRepository(session)
+    certification_service = CertificationService(certification_repository)
 
     
     mail = input("Mail: ")
@@ -23,9 +26,9 @@ def main():
     
     if succes:
         role = employee.role.denomination_role 
-        if role == "Employee":
+        if role != "Employee":
             #print("employee menu under-construction")
-            employee_controller = EmployeeController(employee,skill_service)
+            employee_controller = EmployeeController(employee,skill_service,certification_service)
             employee_controller.get_main_employee_menu()
         elif role == "Manager":
             print("manager menu under-construction")

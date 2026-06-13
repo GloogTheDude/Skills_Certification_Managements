@@ -1,8 +1,8 @@
 """create initial schema
 
-Revision ID: 30e5e4e40fe9
+Revision ID: a8c26db4a282
 Revises: 
-Create Date: 2026-06-11 15:14:52.435537
+Create Date: 2026-06-12 15:25:24.858886
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '30e5e4e40fe9'
+revision: str = 'a8c26db4a282'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -111,6 +111,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id_diploma', 'id_skill')
     )
     op.create_table('employeexcertification',
+    sa.Column('id_employee_certification', sa.Integer(), nullable=False),
     sa.Column('id_employee', sa.Integer(), nullable=False),
     sa.Column('id_certification', sa.Integer(), nullable=False),
     sa.Column('start_', sa.Date(), nullable=True),
@@ -118,11 +119,11 @@ def upgrade() -> None:
     sa.Column('expiration', sa.Date(), nullable=True),
     sa.Column('organism', sa.String(length=50), nullable=True),
     sa.Column('evaluation', sa.String(length=50), nullable=True),
-    sa.Column('doc', sa.String(length=50), nullable=True),
+    sa.Column('doc', sa.String(length=255), nullable=True),
     sa.Column('is_deleted', sa.Boolean(), server_default='false', nullable=False),
     sa.ForeignKeyConstraint(['id_certification'], ['certification.id_certification'], ),
     sa.ForeignKeyConstraint(['id_employee'], ['employee.id_employee'], ),
-    sa.PrimaryKeyConstraint('id_employee', 'id_certification')
+    sa.PrimaryKeyConstraint('id_employee_certification')
     )
     op.create_table('employeexdiploma',
     sa.Column('id_employee', sa.Integer(), nullable=False),

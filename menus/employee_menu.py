@@ -1,4 +1,5 @@
 from dto.employee_skill_dto import EmployeeSkillDTO
+from dto.employee_certification_dto import EmployeeCertificationDTO
 
 class EmployeeMenu():
     def __init__(self):
@@ -19,8 +20,14 @@ class EmployeeMenu():
         print("===============YOUR SKILLS=================")
         print(f"{'Skill':<12} | {'Level':<7}")
         for es in skills_employee:
-            print(f"{es.skill_name:<12} - {es.level:<7}")
+            print(f"{es.skill_name:<12} | {es.level:<7}")
         print("===========================================")
     
-    def display_certification(self, certifications_employee:list(EmployeeCertificationDTO)):
-        
+    def display_certification(self, certifications_employee:list[EmployeeCertificationDTO]):
+        print("==========YOUR CERTIFICATIONS==============")
+        print(f"{'certifications':<25}|{'peremption':<10}|{'skills'}")
+        for ec in certifications_employee:
+            print(
+                f"{ec.certification_name:<25}|{ec.expiration_date}|"
+                f"{', '.join(f'{s.skill_name}({s.level})' for s in ec.skills)}")
+        print("===========================================")

@@ -4,11 +4,13 @@ from menus.employee_menu import EmployeeMenu
 from dto.employee_skill_dto import EmployeeSkillDTO
 from db.repositories.skills_repository import SkillRepository
 from services.skill_service import SkillService
+from services.certification_service import CertificationService
 
 class EmployeeController():
-    def __init__(self,emp: Employee,skill_service: SkillService):
+    def __init__(self,emp: Employee,skill_service: SkillService, certification_service:CertificationService):
         self.employee = emp
         self.skill_service = skill_service
+        self.certification_service=certification_service
     
     def get_main_employee_menu(self):
         em = EmployeeMenu()
@@ -19,8 +21,9 @@ class EmployeeController():
                 case 1: #1. see skills
                     skills= self.skill_service.get_skill_employee(self.employee.id_employee)
                     em.display_skills(skills_employee=skills)
-                case 2: #2. see certifications
-                    pass
+                case 2: 
+                    certifications_employee = self.certification_service.fetch_certification_employee(self.employee.id_employee)
+                    em.display_certification(certifications_employee)
                 case 3: #3. ask for training
                     pass
                 case 0:
