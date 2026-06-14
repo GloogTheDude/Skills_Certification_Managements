@@ -7,18 +7,32 @@ from db.repositories.skills_repository import SkillRepository
 from services.skill_service import SkillService
 from services.certification_service import CertificationService
 from db.repositories.certification_repository import CertificationRepository
+from services.training_service import TrainingService
+from db.repositories.training_repository import TrainingRepository
+from services.training_request_service import TrainingRequestService
+from db.repositories.training_request_repository import TrainingRequestRepository
+
+
 
 def main():
     session = SessionLocal()
     employee_repo = EmployeeRepository(session)
+    
     login_serv = LoginService(employee_repo)
     login_control = LoginController(login_serv)
+    
     skill_repo = SkillRepository(session)
     skill_service = SkillService(skill_repo)
+    
     certification_repository = CertificationRepository(session)
     certification_service = CertificationService(certification_repository)
-
     
+    training_repository = TrainingRepository(session)
+    training_service = TrainingService(training_repository)
+
+    training_request_repository = TrainingRequestRepository(session)
+    training_request_service = TrainingRequestService(training_request_repository)
+
     mail = input("Mail: ")
     password = input("Password: ")
     
@@ -27,8 +41,11 @@ def main():
     if succes:
         role = employee.role.denomination_role 
         if role != "Employee":
-            #print("employee menu under-construction")
-            employee_controller = EmployeeController(employee,skill_service,certification_service)
+            employee_controller = EmployeeController(employee,
+                                                     skill_service,
+                                                     certification_service,
+                                                     training_service,
+                                                     training_request_service)
             employee_controller.get_main_employee_menu()
         elif role == "Manager":
             print("manager menu under-construction")
