@@ -5,6 +5,7 @@ from models.employee import Employee
 from core.constants import TRAININGREQUESTSTATUS
 from datetime import datetime, date
 from dto.training_request_dto import TrainingRequestDTO
+from dto.employee_dto import EmployeeDTO
 
 class TrainingRequestService():
 
@@ -14,7 +15,7 @@ class TrainingRequestService():
     from datetime import date
 
     def call_add_request_preplanned_training(self,
-                        employee: Employee,
+                        employee: EmployeeDTO,
                         preplanned_training: TrainingSummaryDTO,):
         tr = TrainingRequest()
 
@@ -35,7 +36,7 @@ class TrainingRequestService():
             print(f"Error: {e}")
 
 
-    def call_add_request_personalised_training(self, employee:Employee,request_desc:str):
+    def call_add_request_personalised_training(self, employee:EmployeeDTO,request_desc:str):
         print("call_add_request_personalised_training")
         tr = TrainingRequest()
 
@@ -55,7 +56,7 @@ class TrainingRequestService():
             print(f"Error: {e}")
 
     
-    def get_employee_request(self, employee: Employee) -> list[TrainingRequestDTO]:
+    def get_employee_request(self, employee: EmployeeDTO) -> list[TrainingRequestDTO]:
         requests = self.training_request_repository.get_employee_request(
             employee.id_employee
         )

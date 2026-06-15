@@ -11,7 +11,7 @@ from services.training_service import TrainingService
 from db.repositories.training_repository import TrainingRepository
 from services.training_request_service import TrainingRequestService
 from db.repositories.training_request_repository import TrainingRequestRepository
-
+from dto.employee_dto import EmployeeDTO
 
 
 def main():
@@ -36,12 +36,14 @@ def main():
     mail = input("Mail: ")
     password = input("Password: ")
     
-    succes,employee,extra = login_control.login(mail, password)
+    
+    succes,employee_dto,extra = login_control.login(mail, password)
     
     if succes:
-        role = employee.role.denomination_role 
-        if role != "Employee":
-            employee_controller = EmployeeController(employee,
+        print(f"access_label = {employee_dto.access_label}")
+        role = employee_dto.access_label
+        if role == "Employee":
+            employee_controller = EmployeeController(employee_dto,
                                                      skill_service,
                                                      certification_service,
                                                      training_service,

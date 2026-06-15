@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from models.employee import Employee
 from models.role import Role
+from models.access_level import AccessLevel
 
 
 class EmployeeRepository:
@@ -37,12 +38,20 @@ class EmployeeRepository:
         )
         return self.session.scalars(stmt).all()
     
-    def get_by_mail(self, mail:str)-> Employee|None:
-        stmt=(
-            select(Employee)
+    def get_by_mail_with_access(self, mail: str):
+        stmt = (
+            select(
+                Employee,
+                Role.denomination_role,
+                AccessLevel.label,
+                AccessLevel.level,
+            )
+            .join(Role, Employee.id_role == Role.id_role)
+            .join(AccessLevel, Role.id_access_level == AccessLevel.id_access_level)
             .where(Employee.mail == mail)
         )
-        return self.session.scalar(stmt)
+
+        return self.session.execute(stmt).first()
 
     def get_subordinates(self, id_manager:int)->list[Employee]:
         stmt=(

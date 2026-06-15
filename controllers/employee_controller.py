@@ -6,9 +6,10 @@ from controllers.training_request_controller import TrainingRequestController
 from services.training_service import TrainingService
 from db.repositories.training_repository import TrainingRepository
 from services.training_request_service import TrainingRequestService
+from dto.employee_dto import EmployeeDTO
 
 class EmployeeController():
-    def __init__(self,emp: Employee,
+    def __init__(self,emp: EmployeeDTO,
                  skill_service: SkillService, 
                  certification_service:CertificationService,
                  training_service: TrainingService,
@@ -36,7 +37,6 @@ class EmployeeController():
                     trc = TrainingRequestController(self.training_service, self.training_request_service, self.employee)
                     trc.get_training_request_menu()
                 case 4:
-                    print("SHOULD LEAD YOU TO FOLLOW UP")
                     trc = TrainingRequestController(self.training_service, self.training_request_service, self.employee)
                     trc.follow_up_request()
                 case 0:

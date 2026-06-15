@@ -2,10 +2,10 @@ from services.training_service import TrainingService
 from models.employee import Employee
 from menus.training_request_menu import TrainingRequestMenu
 from services.training_request_service import TrainingRequestService
-
+from dto.employee_dto import EmployeeDTO
 class TrainingRequestController():
     
-    def __init__(self, training_service:TrainingService, training_request_service: TrainingRequestService,employee: Employee):
+    def __init__(self, training_service:TrainingService, training_request_service: TrainingRequestService,employee: EmployeeDTO):
         self.training_service = training_service
         self.employee = employee
         self.training_request_service = training_request_service
@@ -26,8 +26,7 @@ class TrainingRequestController():
                     print("case 1")
                     self.see_all_info(self.training_request_menu,trainings_availables,domaine_filter)
                 case 2:
-                    self.select_preplaned_training(self.training_request_menu,
-                                                   trainings_availables,
+                    self.select_preplaned_training(trainings_availables,
                                                    domaine_filter)
                 case 3:
                     self.make_personalised_request()
