@@ -66,6 +66,7 @@ class TestEmployeeRepository(unittest.TestCase):
 
         self.assertIsInstance(count, int)
         self.assertGreaterEqual(count, 15)
+        
     def test_save_and_delete_employee(self):
         employee = Employee(
             first_name="Test",

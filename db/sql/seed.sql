@@ -21,18 +21,24 @@ TRUNCATE TABLE
     public.skill,
     public.employee,
     public.role,
+    public.access_level,
     public.domaine
 RESTART IDENTITY CASCADE;
 
 -- Reference tables
-INSERT INTO public.role (id_role, denomination_role, is_deleted) VALUES
-(1, 'Admin RH', false),
-(2, 'Manager IT', false),
-(3, 'Developer', false),
-(4, 'Data Analyst', false),
-(5, 'Security Officer', false),
-(6, 'Project Manager', false),
-(7, 'Intern', false);
+INSERT INTO public.access_level (id_access_level, label, level) VALUES
+(1, 'Employee', 1),
+(2, 'Manager', 2),
+(3, 'HR', 3);
+
+INSERT INTO public.role (id_role, denomination_role, is_deleted, id_access_level) VALUES
+(1, 'Admin RH', false, 3),
+(2, 'Manager IT', false, 2),
+(3, 'Developer', false, 1),
+(4, 'Data Analyst', false, 1),
+(5, 'Security Officer', false, 1),
+(6, 'Project Manager', false, 2),
+(7, 'Intern', false, 1);
 
 INSERT INTO public.domaine (id_domaine, nom_domaine, is_deleted) VALUES
 (1, 'Backend', false),
@@ -277,6 +283,7 @@ INSERT INTO public.skill_validation (id_skill_validation, date_, level_skill, id
 (20, '2026-06-01', 2, 5, 10, 4, 1, false);
 
 -- Make serial sequences consistent after explicit ids
+SELECT setval(pg_get_serial_sequence('public.access_level', 'id_access_level'), COALESCE((SELECT MAX(id_access_level) FROM public.access_level), 1), true);
 SELECT setval(pg_get_serial_sequence('public.role', 'id_role'), COALESCE((SELECT MAX(id_role) FROM public.role), 1), true);
 SELECT setval(pg_get_serial_sequence('public.domaine', 'id_domaine'), COALESCE((SELECT MAX(id_domaine) FROM public.domaine), 1), true);
 SELECT setval(pg_get_serial_sequence('public.skill', 'id_skill'), COALESCE((SELECT MAX(id_skill) FROM public.skill), 1), true);

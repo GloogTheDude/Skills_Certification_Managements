@@ -19,8 +19,10 @@ from .training_diploma import TrainingDiploma
 from .training_skill import TrainingSkill
 from .training_certification import TrainingCertification
 from .provide import Provide
+from .access_level import AccessLevel
 
 __all__ = [
+    "AccessLevel",
     "Base",
     "Role",
     "Skill",
