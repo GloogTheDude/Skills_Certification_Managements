@@ -8,8 +8,18 @@ class FakeEmployeeRepository:
     def __init__(self, employees_by_mail):
         self.employees_by_mail = employees_by_mail
 
-    def get_by_mail(self, mail: str):
-        return self.employees_by_mail.get(mail)
+    def get_by_mail_with_access(self, mail: str):
+        employee = self.employees_by_mail.get(mail)
+
+        if employee is None:
+            return None
+
+        return (
+            employee,
+            "Developer",
+            "Employee",
+            1,
+        )
 
 
 class TestLoginService(unittest.TestCase):
@@ -26,7 +36,12 @@ class TestLoginService(unittest.TestCase):
 
         result = service.login("test@company.be", "hash")
 
-        self.assertIs(result, employee)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.mail, employee.mail)
+        self.assertEqual(result.first_name, employee.first_name)
+        self.assertEqual(result.role_name, "Developer")
+        self.assertEqual(result.access_label, "Employee")
+        self.assertEqual(result.access_level, 1)
 
     def test_login_returns_none_when_mail_is_unknown(self):
         service = LoginService(FakeEmployeeRepository({}))

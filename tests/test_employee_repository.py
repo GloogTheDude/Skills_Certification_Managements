@@ -34,13 +34,13 @@ class TestEmployeeRepository(unittest.TestCase):
         self.assertIsInstance(employees[0], Employee)
 
     def test_get_by_mail_existing_employee(self):
-        employee = self.repo.get_by_mail("david.henrichmann@example.com")
+        employee = self.repo.get_by_mail_with_access("david.henrichmann@example.com")
 
         self.assertIsNotNone(employee)
-        self.assertEqual(employee.first_name, "David")
+        self.assertEqual(employee[0].first_name, "David")
 
     def test_get_by_mail_unknown_returns_none(self):
-        employee = self.repo.get_by_mail("unknown@company.be")
+        employee = self.repo.get_by_mail_with_access("unknown@company.be")
 
         self.assertIsNone(employee)
 
@@ -81,13 +81,13 @@ class TestEmployeeRepository(unittest.TestCase):
 
         self.assertIsNotNone(employee.id_employee)
 
-        saved_employee = self.repo.get_by_mail("test.user@company.be")
+        saved_employee = self.repo.get_by_mail_with_access("test.user@company.be")
         self.assertIsNotNone(saved_employee)
-        self.assertEqual(saved_employee.first_name, "Test")
+        self.assertEqual(saved_employee[0].first_name, "Test")
 
-        self.repo.delete(saved_employee)
+        self.repo.delete(saved_employee[0])
 
-        deleted_employee = self.repo.get_by_mail("test.user@company.be")
+        deleted_employee = self.repo.get_by_mail_with_access("test.user@company.be")
         self.assertIsNone(deleted_employee)
 
 

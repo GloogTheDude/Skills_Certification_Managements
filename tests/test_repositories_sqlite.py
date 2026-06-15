@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from db.repositories.employee_repository import EmployeeRepository
 from db.repositories.training_repository import TrainingRepository
 from db.repositories.training_request_repository import TrainingRequestRepository
-from models import Base, Role, Employee, Domaine, Training, TrainingRequest
+from models import Base, Role, Employee, Domaine, Training, TrainingRequest,AccessLevel
 
 
 class RepositorySQLiteTestCase(unittest.TestCase):
@@ -32,6 +32,9 @@ class RepositorySQLiteTestCase(unittest.TestCase):
 
     def seed(self):
         self.session.add_all([
+            AccessLevel(id_access_level=1, label="Employee", level=1),
+            AccessLevel(id_access_level=2, label="Manager", level=2),
+            AccessLevel(id_access_level=3, label="HR", level=3),
             Role(id_role=1, denomination_role="Employee"),
             Role(id_role=2, denomination_role="Manager"),
             Domaine(id_domaine=1, nom_domaine="Backend", is_deleted=False),
@@ -55,8 +58,8 @@ class RepositorySQLiteTestCase(unittest.TestCase):
 
         self.assertEqual(repo.get_by_id(4).first_name, "David")
         self.assertIsNone(repo.get_by_id(999))
-        self.assertEqual(repo.get_by_mail("david@company.be").id_employee, 4)
-        self.assertIsNone(repo.get_by_mail("missing@company.be"))
+        self.assertEqual(repo.get_by_mail_with_access("david@company.be")[0].id_employee, 4)
+        self.assertIsNone(repo.get_by_mail_with_access("missing@company.be"))
         self.assertEqual({e.id_employee for e in repo.get_by_role("Employee")}, {4, 5})
         self.assertEqual({e.id_employee for e in repo.get_subordinates(1)}, {4, 5})
         self.assertEqual(repo.count_all(), 3)
@@ -67,10 +70,10 @@ class RepositorySQLiteTestCase(unittest.TestCase):
 
         repo.save(employee)
         self.assertIsNotNone(employee.id_employee)
-        self.assertEqual(repo.get_by_mail("test@company.be").first_name, "Test")
+        self.assertEqual(repo.get_by_mail_with_access("test@company.be")[0].first_name, "Test")
 
         repo.delete(employee)
-        self.assertIsNone(repo.get_by_mail("test@company.be"))
+        self.assertIsNone(repo.get_by_mail_with_access("test@company.be"))
 
     def test_training_repository_excludes_requested_past_deleted_and_deleted_domaines(self):
         repo = TrainingRepository(self.session)
