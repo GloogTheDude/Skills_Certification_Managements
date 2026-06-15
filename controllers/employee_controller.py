@@ -25,7 +25,6 @@ class EmployeeController():
         user_choice = -1
         while user_choice != 0:
             user_choice = em.main_menu()
-            print(f"****user_choice: {user_choice}****")
             match user_choice:
                 case 1: #1. see skills
                     skills= self.skill_service.get_skill_employee(self.employee.id_employee)
