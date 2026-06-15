@@ -27,8 +27,8 @@ class TrainingRequestRepository():
                 Training.title,
                 Domaine.nom_domaine,
             )
-            .join(TrainingRequest.training)
-            .join(Training.domaine)
+            .outerjoin(TrainingRequest.training)
+            .outerjoin(Training.domaine)
             .where(TrainingRequest.id_employee == id_employee)
         )
         return self.session.execute(stmt).all()

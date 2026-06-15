@@ -15,7 +15,7 @@ class TestEmployeeRepository(unittest.TestCase):
         self.session.close()
 
     def test_get_by_id_existing_employee(self):
-        employee = self.repo.get_by_id(3)
+        employee = self.repo.get_by_id(4)
 
         self.assertIsNotNone(employee)
         self.assertIsInstance(employee, Employee)
@@ -34,7 +34,7 @@ class TestEmployeeRepository(unittest.TestCase):
         self.assertIsInstance(employees[0], Employee)
 
     def test_get_by_mail_existing_employee(self):
-        employee = self.repo.get_by_mail("david@company.be")
+        employee = self.repo.get_by_mail("david.henrichmann@example.com")
 
         self.assertIsNotNone(employee)
         self.assertEqual(employee.first_name, "David")
@@ -45,29 +45,27 @@ class TestEmployeeRepository(unittest.TestCase):
         self.assertIsNone(employee)
 
     def test_get_by_role_returns_employee_list(self):
-        employees = self.repo.get_by_role("Employee")
+        employees = self.repo.get_by_role("Developer")
 
         self.assertIsInstance(employees, list)
-        self.assertGreaterEqual(len(employees), 1)
+        self.assertGreaterEqual(len(employees), 5)
 
         mails = [employee.mail for employee in employees]
-        self.assertIn("david@company.be", mails)
+        self.assertIn("david.henrichmann@example.com", mails)
 
     def test_get_subordinates_returns_employee_list(self):
-        employees = self.repo.get_subordinates(2)
+        employees = self.repo.get_subordinates(1)
 
         self.assertIsInstance(employees, list)
 
         mails = [employee.mail for employee in employees]
-        self.assertIn("david@company.be", mails)
-        self.assertIn("pierre@company.be", mails)
+        self.assertIn("marc.dubois@example.com", mails)
 
     def test_count_all(self):
         count = self.repo.count_all()
 
         self.assertIsInstance(count, int)
-        self.assertGreaterEqual(count, 4)
-
+        self.assertGreaterEqual(count, 15)
     def test_save_and_delete_employee(self):
         employee = Employee(
             first_name="Test",
