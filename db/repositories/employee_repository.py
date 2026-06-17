@@ -26,9 +26,11 @@ class EmployeeRepository:
         self.session.add(employee)
         self.session.commit()
     
-    def delete(self,employee:Employee)->None:
-        self.session.delete(employee)
-        self.session.commit()
+    def delete(self, employee: Employee) -> None:
+        db_employee = self.session.get(Employee, employee.id_employee)
+        if db_employee is not None:
+            db_employee.is_deleted = True
+            self.session.commit()
     
     def get_by_role(self, role_name: str) -> list[Employee]:
         stmt = (
