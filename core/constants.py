@@ -1,7 +1,7 @@
 from enum import Enum
 
 class TRAININGREQUESTSTATUS(Enum):
-    PENDING = "PENDING"
-    VALIDATED ="VALIDATED"
-    REFUSED = "REFUSED"
+    PENDING = "pending"
+    VALIDATED ="validated"
+    REFUSED = "refused"
     

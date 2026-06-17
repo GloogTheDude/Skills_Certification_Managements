@@ -4,7 +4,7 @@ from models.training_request import TrainingRequest
 from models.employee import Employee
 from core.constants import TRAININGREQUESTSTATUS
 from datetime import datetime, date
-from dto.training_request_dto import TrainingRequestDTO
+from dto.training_request_dto import TrainingRequestDTO, PendingTrainingRequestForManagerDTO
 from dto.employee_dto import EmployeeDTO
 
 class TrainingRequestService():
@@ -84,3 +84,30 @@ class TrainingRequestService():
 
     def get_available_domaines(self):
         return self.training_request_repository.get_domaines_available()
+    
+    def get_pending_request_for_manager(self, id_manager:int)->list[PendingTrainingRequestForManagerDTO]:
+        rows = self.training_request_repository.get_pending_request_for_manager(id_manager)
+        result =[]
+        for tr, employee, training, domaine_name in rows:
+            dto = PendingTrainingRequestForManagerDTO(
+                id_training_request=tr.id_training_request,
+                request_desc=tr.request_desc,
+
+                status=tr.status,
+                reason=tr.reason,
+                requested_at=tr.requested_at,
+
+                id_employee=tr.id_employee,
+                first_name_employee = employee.first_name,
+                last_name_employee= employee.last_name,
+                id_training=tr.id_training,
+                #id_validator=tr.id_validator,
+
+                training_title=training.title,
+                domaine_name=domaine_name,
+            )
+            result.append(dto)
+        return result
+
+    def update_request_status(self, id_request, status, reason, id_validator ):
+        self.training_request_repository.update_request_status(id_request, status, reason, id_validator )

@@ -1,8 +1,12 @@
 from services.training_service import TrainingService
 from models.employee import Employee
 from menus.training_request_menu import TrainingRequestMenu
+from menus.validation_request_menu import ValidationRequestMenu
 from services.training_request_service import TrainingRequestService
 from dto.employee_dto import EmployeeDTO
+from core.constants import TRAININGREQUESTSTATUS
+
+
 class TrainingRequestController():
     
     def __init__(self, training_service:TrainingService, training_request_service: TrainingRequestService,employee: EmployeeDTO):
@@ -116,3 +120,39 @@ class TrainingRequestController():
                 return
             self.training_request_menu.display_employee_request_details(user_choice)
 
+    def manage_pending_requests_for_manager(self, manager: EmployeeDTO):
+        print("manage_pending_requests_for_manager")
+        menu = ValidationRequestMenu()
+
+        while True:
+            pending_requests = self.training_request_service.get_pending_request_for_manager(
+                manager.id_employee
+            )
+
+            selected_request = menu.select_pending_request_to_update(pending_requests)
+
+            if selected_request is None:
+                return
+
+            status_choice = menu.select_new_request_status()
+
+            if status_choice == 0:
+                return
+
+            reason = None
+
+            match status_choice:
+                case 1:
+                    new_status = TRAININGREQUESTSTATUS.VALIDATED.value
+                case 2:
+                    new_status = TRAININGREQUESTSTATUS.REFUSED.value
+                    reason = menu.get_reason()
+                case _:
+                    return
+
+            self.training_request_service.update_request_status(
+                selected_request.id_training_request,
+                new_status,
+                reason,
+                manager.id_employee,
+            )

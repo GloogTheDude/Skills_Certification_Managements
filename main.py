@@ -12,6 +12,7 @@ from db.repositories.training_repository import TrainingRepository
 from services.training_request_service import TrainingRequestService
 from db.repositories.training_request_repository import TrainingRequestRepository
 from dto.employee_dto import EmployeeDTO
+from controllers.manager_controller import ManagerController
 
 
 def main():
@@ -50,7 +51,12 @@ def main():
                                                      training_request_service)
             employee_controller.get_main_employee_menu()
         elif role == "Manager":
-            print("manager menu under-construction")
+            manager_controller = ManagerController(employee_dto,
+                                                     skill_service,
+                                                     certification_service,
+                                                     training_service,
+                                                     training_request_service)
+            manager_controller.get_main_manager_menu()
         elif role == "HR":
             print("HR menu under-construction")
     else:

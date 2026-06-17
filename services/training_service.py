@@ -33,5 +33,7 @@ class TrainingService():
 
         return domaines
     
+
+
     
             
