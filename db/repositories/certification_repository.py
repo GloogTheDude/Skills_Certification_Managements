@@ -12,7 +12,6 @@ class CertificationRepository():
     def __init__(self, session: Session):
         self.session = session
     
-    from sqlalchemy import or_
 
     def get_certification_skill_by_id_employee(self, id_employee: int):
         stmt = (
