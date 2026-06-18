@@ -6,8 +6,6 @@ TRUNCATE TABLE
     public.training_request,
     public.participation,
     public.provide,
-    public.trainingxcertification,
-    public.trainingxdiploma,
     public.trainingxskill,
     public.certificationxskill,
     public.diplomaxskill,
@@ -128,19 +126,35 @@ INSERT INTO public.certification (id_certification, subject_certification, is_de
 (10, 'Git Professional', false, 4);
 
 -- Trainings
-INSERT INTO public.training (id_training, title, id_domaine, start_, end_, is_deleted) VALUES
-(1, 'Python Backend Bootcamp', 1, '2026-01-08', '2026-01-19', false),
-(2, 'Advanced SQL PostgreSQL', 3, '2026-02-05', '2026-02-09', false),
-(3, 'SQLAlchemy and Alembic', 1, '2026-02-19', '2026-02-23', false),
-(4, 'Docker for Developers', 4, '2026-03-04', '2026-03-06', false),
-(5, 'Linux Administration Basics', 4, '2026-03-11', '2026-03-15', false),
-(6, 'Security Awareness Workshop', 5, '2026-03-25', '2026-03-25', false),
-(7, 'Power BI Reporting', 6, '2026-04-08', '2026-04-12', false),
-(8, 'Agile Scrum Practice', 7, '2026-04-22', '2026-04-24', false),
-(9, 'REST API Design', 1, '2026-05-06', '2026-05-10', false),
-(10, 'Git Workflow Team Training', 4, '2026-05-20', '2026-05-21', false),
-(11, 'Java Refresher', 1, '2026-06-03', '2026-06-07', false),
-(12, 'Internal Communication', 8, '2026-06-17', '2026-06-17', false);
+-- New model: a training may target either one certification OR one diploma OR only skills.
+-- id_certification and id_diploma must not both be non-NULL.
+INSERT INTO public.training (
+    id_training,
+    title,
+    id_domaine,
+    start_,
+    end_,
+    is_deleted,
+    id_certification,
+    id_diploma
+) VALUES
+(1, 'Python Backend Bootcamp', 1, '2026-01-08', '2026-01-19', false, 1, NULL),
+(2, 'Advanced SQL PostgreSQL', 3, '2026-02-05', '2026-02-09', false, 3, NULL),
+(3, 'SQLAlchemy and Alembic', 1, '2026-02-19', '2026-02-23', false, NULL, 1),
+(4, 'Docker for Developers', 4, '2026-03-04', '2026-03-06', false, 4, NULL),
+(5, 'Linux Administration Basics', 4, '2026-03-11', '2026-03-15', false, 5, NULL),
+(6, 'Security Awareness Workshop', 5, '2026-03-25', '2026-03-25', false, 6, NULL),
+(7, 'Power BI Reporting', 6, '2026-04-08', '2026-04-12', false, 7, NULL),
+(8, 'Agile Scrum Practice', 7, '2026-04-22', '2026-04-24', false, 8, NULL),
+(9, 'REST API Design', 1, '2026-05-06', '2026-05-10', false, 9, NULL),
+(10, 'Git Workflow Team Training', 4, '2026-05-20', '2026-05-21', false, 10, NULL),
+(11, 'Java Refresher', 1, '2026-06-03', '2026-06-07', false, 2, NULL),
+(12, 'Internal Communication', 8, '2026-06-17', '2026-06-17', false, NULL, NULL),
+(13, 'Bachelor IT Bridge Program', 1, '2026-07-06', '2026-07-31', false, NULL, 1),
+(14, 'Network Diploma Preparation', 4, '2026-08-03', '2026-08-21', false, NULL, 3),
+(15, 'Cybersecurity Master Preparation', 5, '2026-09-01', '2026-09-25', false, NULL, 4),
+(16, 'Data Science Diploma Track', 6, '2026-10-05', '2026-10-30', false, NULL, 5),
+(17, 'IT Project Management Degree Track', 7, '2026-11-02', '2026-11-20', false, NULL, 6);
 
 -- Diploma requirements
 INSERT INTO public.diplomaxskill (id_diploma, id_skill, min_level, is_deleted) VALUES
@@ -177,14 +191,14 @@ INSERT INTO public.trainingxskill (id_skill, id_training, granted_level, is_dele
 (10, 9, 4, false), (1, 9, 2, false),
 (7, 10, 4, false), (20, 10, 2, false),
 (2, 11, 3, false), (19, 11, 2, false),
-(18, 12, 4, false);
+(18, 12, 4, false),
+(1, 13, 3, false), (2, 13, 2, false), (3, 13, 3, false), (7, 13, 2, false),
+(9, 14, 3, false), (14, 14, 4, false), (13, 14, 2, false),
+(13, 15, 5, false), (14, 15, 4, false), (9, 15, 3, false),
+(3, 16, 4, false), (15, 16, 4, false), (16, 16, 3, false),
+(17, 17, 4, false), (18, 17, 4, false);
 
--- Training -> diplomas/certifications
-INSERT INTO public.trainingxcertification (id_certification, id_training) VALUES
-(1, 1), (3, 2), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10), (2, 11);
-
-INSERT INTO public.trainingxdiploma (id_diploma, id_training) VALUES
-(1, 1), (1, 2), (1, 3), (3, 5), (4, 6), (5, 7), (6, 8);
+-- Training -> diplomas/certifications are now stored directly in public.training
 
 -- Providers
 INSERT INTO public.provide (id_training, id_source, cost_hour, duration_hours, is_active) VALUES
@@ -199,7 +213,12 @@ INSERT INTO public.provide (id_training, id_source, cost_hour, duration_hours, i
 (9, 1, 88.00, 35.00, true),
 (10, 7, 0.00, 14.00, true),
 (11, 4, 48.00, 35.00, true),
-(12, 7, 0.00, 7.00, true);
+(12, 7, 0.00, 7.00, true),
+(13, 5, 75.00, 120.00, true),
+(14, 2, 80.00, 105.00, true),
+(15, 5, 120.00, 140.00, true),
+(16, 3, 90.00, 120.00, true),
+(17, 6, 95.00, 90.00, true);
 
 -- Employee diplomas
 INSERT INTO public.employeexdiploma (id_employee, id_diploma, end_, school, start_, distinction, doc, is_deleted) VALUES
