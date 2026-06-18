@@ -20,4 +20,6 @@ class Certification(Base):
     domaine = relationship("Domaine", back_populates="certifications")
     employees = relationship("EmployeeCertification", back_populates="certification")
     skill_links = relationship("CertificationSkill", back_populates="certification")
-    training_links = relationship("TrainingCertification", back_populates="certification")
+    trainings = relationship("Training",back_populates="certification")
+
+    #should add average duration

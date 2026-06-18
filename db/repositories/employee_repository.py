@@ -48,9 +48,14 @@ class EmployeeRepository:
                 AccessLevel.label,
                 AccessLevel.level,
             )
-            .join(Role, Employee.id_role == Role.id_role)
-            .join(AccessLevel, Role.id_access_level == AccessLevel.id_access_level)
-            .where(Employee.mail == mail)
+            .join(Employee.role)
+            .join(Role.access_level)
+            .where(
+                Employee.mail == mail,
+                Employee.is_deleted.is_(False),
+                Role.is_deleted.is_(False),
+                AccessLevel.id_access_level.is_not(None),
+            )
         )
 
         return self.session.execute(stmt).first()

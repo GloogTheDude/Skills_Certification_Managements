@@ -18,4 +18,3 @@ class DiplomaSkill(Base):
 
     diploma = relationship("Diploma", back_populates="skill_links")
     skill = relationship("Skill", back_populates="diploma_links")
-    trainings = relationship("Training", back_populates="diploma")

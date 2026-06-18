@@ -3,119 +3,64 @@
 BEGIN;
 
 
-ALTER TABLE IF EXISTS public.certification DROP CONSTRAINT IF EXISTS certification_id_domaine_fkey;
+CREATE TABLE IF NOT EXISTS public.access_level
+(
+    id_access_level serial NOT NULL,
+    label character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    level integer NOT NULL,
+    CONSTRAINT access_level_pkey PRIMARY KEY (id_access_level)
+);
 
-ALTER TABLE IF EXISTS public.certificationxskill DROP CONSTRAINT IF EXISTS certificationxskill_id_certification_fkey;
-
-ALTER TABLE IF EXISTS public.certificationxskill DROP CONSTRAINT IF EXISTS certificationxskill_id_skill_fkey;
-
-ALTER TABLE IF EXISTS public.diploma DROP CONSTRAINT IF EXISTS diploma_id_domaine_fkey;
-
-ALTER TABLE IF EXISTS public.diplomaxskill DROP CONSTRAINT IF EXISTS diplomaxskill_id_diploma_fkey;
-
-ALTER TABLE IF EXISTS public.diplomaxskill DROP CONSTRAINT IF EXISTS diplomaxskill_id_skill_fkey;
-
-ALTER TABLE IF EXISTS public.employee DROP CONSTRAINT IF EXISTS employee_id_manager_fkey;
-
-ALTER TABLE IF EXISTS public.employee DROP CONSTRAINT IF EXISTS employee_id_role_fkey;
-
-ALTER TABLE IF EXISTS public.employeexcertification DROP CONSTRAINT IF EXISTS employeexcertification_id_certification_fkey;
-
-ALTER TABLE IF EXISTS public.employeexcertification DROP CONSTRAINT IF EXISTS employeexcertification_id_employee_fkey;
-
-ALTER TABLE IF EXISTS public.employeexdiploma DROP CONSTRAINT IF EXISTS employeexdiploma_id_diploma_fkey;
-
-ALTER TABLE IF EXISTS public.employeexdiploma DROP CONSTRAINT IF EXISTS employeexdiploma_id_employee_fkey;
-
-ALTER TABLE IF EXISTS public.participation DROP CONSTRAINT IF EXISTS participation_id_employee_fkey;
-
-ALTER TABLE IF EXISTS public.participation DROP CONSTRAINT IF EXISTS participation_id_training_fkey;
-
-ALTER TABLE IF EXISTS public.provide DROP CONSTRAINT IF EXISTS provide_id_source_fkey;
-
-ALTER TABLE IF EXISTS public.provide DROP CONSTRAINT IF EXISTS provide_id_training_fkey;
-
-ALTER TABLE IF EXISTS public.skill_validation DROP CONSTRAINT IF EXISTS skill_validation_id_employee_fkey;
-
-ALTER TABLE IF EXISTS public.skill_validation DROP CONSTRAINT IF EXISTS skill_validation_id_skill_fkey;
-
-ALTER TABLE IF EXISTS public.skill_validation DROP CONSTRAINT IF EXISTS skill_validation_id_validation_fkey;
-
-ALTER TABLE IF EXISTS public.skill_validation DROP CONSTRAINT IF EXISTS skill_validation_id_validator_fkey;
-
-ALTER TABLE IF EXISTS public.training DROP CONSTRAINT IF EXISTS training_id_domaine_fkey;
-
-ALTER TABLE IF EXISTS public.training_request DROP CONSTRAINT IF EXISTS training_request_id_employee_fkey;
-
-ALTER TABLE IF EXISTS public.training_request DROP CONSTRAINT IF EXISTS training_request_id_training_fkey;
-
-ALTER TABLE IF EXISTS public.training_request DROP CONSTRAINT IF EXISTS training_request_id_validator_fkey;
-
-ALTER TABLE IF EXISTS public.trainingxcertification DROP CONSTRAINT IF EXISTS trainingxcertification_id_certification_fkey;
-
-ALTER TABLE IF EXISTS public.trainingxcertification DROP CONSTRAINT IF EXISTS trainingxcertification_id_training_fkey;
-
-ALTER TABLE IF EXISTS public.trainingxdiploma DROP CONSTRAINT IF EXISTS trainingxdiploma_id_diploma_fkey;
-
-ALTER TABLE IF EXISTS public.trainingxdiploma DROP CONSTRAINT IF EXISTS trainingxdiploma_id_training_fkey;
-
-ALTER TABLE IF EXISTS public.trainingxskill DROP CONSTRAINT IF EXISTS trainingxskill_id_skill_fkey;
-
-ALTER TABLE IF EXISTS public.trainingxskill DROP CONSTRAINT IF EXISTS trainingxskill_id_training_fkey;
-
-
-
-DROP TABLE IF EXISTS public.certification;
+CREATE TABLE IF NOT EXISTS public.alembic_version
+(
+    version_num character varying(32) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+);
 
 CREATE TABLE IF NOT EXISTS public.certification
 (
     id_certification serial NOT NULL,
     subject_certification character varying(50) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
     id_domaine integer NOT NULL,
     CONSTRAINT certification_pkey PRIMARY KEY (id_certification)
 );
-
-DROP TABLE IF EXISTS public.certificationxskill;
 
 CREATE TABLE IF NOT EXISTS public.certificationxskill
 (
     id_certification integer NOT NULL,
     id_skill integer NOT NULL,
     granted_level integer,
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT certificationxskill_pkey PRIMARY KEY (id_certification, id_skill)
 );
-
-DROP TABLE IF EXISTS public.diploma;
 
 CREATE TABLE IF NOT EXISTS public.diploma
 (
     id_diploma serial NOT NULL,
     subject_diploma character varying(50) COLLATE pg_catalog."default",
     level_diploma character varying(50) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
     id_domaine integer NOT NULL,
     CONSTRAINT diploma_pkey PRIMARY KEY (id_diploma)
 );
-
-DROP TABLE IF EXISTS public.diplomaxskill;
 
 CREATE TABLE IF NOT EXISTS public.diplomaxskill
 (
     id_diploma integer NOT NULL,
     id_skill integer NOT NULL,
     min_level integer,
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT diplomaxskill_pkey PRIMARY KEY (id_diploma, id_skill)
 );
-
-DROP TABLE IF EXISTS public.domaine;
 
 CREATE TABLE IF NOT EXISTS public.domaine
 (
     id_domaine serial NOT NULL,
     nom_domaine character varying(50) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT domaine_pkey PRIMARY KEY (id_domaine)
 );
-
-DROP TABLE IF EXISTS public.employee;
 
 CREATE TABLE IF NOT EXISTS public.employee
 (
@@ -124,15 +69,15 @@ CREATE TABLE IF NOT EXISTS public.employee
     last_name character varying(50) COLLATE pg_catalog."default",
     hash_password character varying(50) COLLATE pg_catalog."default",
     mail character varying(50) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
     id_role integer NOT NULL,
     id_manager integer,
     CONSTRAINT employee_pkey PRIMARY KEY (id_employee)
 );
 
-DROP TABLE IF EXISTS public.employeexcertification;
-
 CREATE TABLE IF NOT EXISTS public.employeexcertification
 (
+    id_employee_certification serial NOT NULL,
     id_employee integer NOT NULL,
     id_certification integer NOT NULL,
     start_ date,
@@ -140,11 +85,10 @@ CREATE TABLE IF NOT EXISTS public.employeexcertification
     expiration date,
     organism character varying(50) COLLATE pg_catalog."default",
     evaluation character varying(50) COLLATE pg_catalog."default",
-    doc character varying(50) COLLATE pg_catalog."default",
-    CONSTRAINT employeexcertification_pkey PRIMARY KEY (id_employee, id_certification)
+    doc character varying(255) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
+    CONSTRAINT employeexcertification_pkey PRIMARY KEY (id_employee_certification)
 );
-
-DROP TABLE IF EXISTS public.employeexdiploma;
 
 CREATE TABLE IF NOT EXISTS public.employeexdiploma
 (
@@ -155,20 +99,18 @@ CREATE TABLE IF NOT EXISTS public.employeexdiploma
     start_ date,
     distinction character varying(50) COLLATE pg_catalog."default",
     doc character varying(50) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT employeexdiploma_pkey PRIMARY KEY (id_employee, id_diploma)
 );
-
-DROP TABLE IF EXISTS public.participation;
 
 CREATE TABLE IF NOT EXISTS public.participation
 (
     id_employee integer NOT NULL,
     id_training integer NOT NULL,
     status character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT participation_pkey PRIMARY KEY (id_employee, id_training)
 );
-
-DROP TABLE IF EXISTS public.provide;
 
 CREATE TABLE IF NOT EXISTS public.provide
 (
@@ -176,28 +118,26 @@ CREATE TABLE IF NOT EXISTS public.provide
     id_source integer NOT NULL,
     cost_hour numeric(15, 2),
     duration_hours numeric(15, 2),
+    is_active boolean NOT NULL DEFAULT true,
     CONSTRAINT provide_pkey PRIMARY KEY (id_training, id_source)
 );
-
-DROP TABLE IF EXISTS public.role;
 
 CREATE TABLE IF NOT EXISTS public.role
 (
     id_role serial NOT NULL,
     denomination_role character varying(50) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
+    id_access_level integer NOT NULL DEFAULT 1,
     CONSTRAINT role_pkey PRIMARY KEY (id_role)
 );
-
-DROP TABLE IF EXISTS public.skill;
 
 CREATE TABLE IF NOT EXISTS public.skill
 (
     id_skill serial NOT NULL,
     name_skill character varying(50) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT skill_pkey PRIMARY KEY (id_skill)
 );
-
-DROP TABLE IF EXISTS public.skill_validation;
 
 CREATE TABLE IF NOT EXISTS public.skill_validation
 (
@@ -208,10 +148,9 @@ CREATE TABLE IF NOT EXISTS public.skill_validation
     id_employee integer NOT NULL,
     id_validator integer NOT NULL,
     id_skill integer NOT NULL,
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT skill_validation_pkey PRIMARY KEY (id_skill_validation)
 );
-
-DROP TABLE IF EXISTS public.training;
 
 CREATE TABLE IF NOT EXISTS public.training
 (
@@ -220,67 +159,49 @@ CREATE TABLE IF NOT EXISTS public.training
     id_domaine integer,
     start_ date,
     end_ date,
+    is_deleted boolean NOT NULL DEFAULT false,
+    id_certification integer,
+    id_diploma integer,
     CONSTRAINT training_pkey PRIMARY KEY (id_training)
 );
-
-DROP TABLE IF EXISTS public.training_request;
 
 CREATE TABLE IF NOT EXISTS public.training_request
 (
     id_training_request serial NOT NULL,
-    status character varying(50) COLLATE pg_catalog."default",
-    reason character varying(50) COLLATE pg_catalog."default",
-    requested_at date,
+    status character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    reason character varying(500) COLLATE pg_catalog."default",
+    requested_at date NOT NULL,
+    is_deleted boolean NOT NULL DEFAULT false,
     id_employee integer NOT NULL,
     id_training integer,
-    id_validator integer NOT NULL,
+    id_validator integer,
+    request_desc character varying(150) COLLATE pg_catalog."default",
     CONSTRAINT training_request_pkey PRIMARY KEY (id_training_request)
 );
-
-DROP TABLE IF EXISTS public.training_source;
 
 CREATE TABLE IF NOT EXISTS public.training_source
 (
     id_source serial NOT NULL,
     name_source character varying(50) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT training_source_pkey PRIMARY KEY (id_source)
 );
-
-DROP TABLE IF EXISTS public.trainingxcertification;
-
-CREATE TABLE IF NOT EXISTS public.trainingxcertification
-(
-    id_certification integer NOT NULL,
-    id_training integer NOT NULL,
-    CONSTRAINT trainingxcertification_pkey PRIMARY KEY (id_certification, id_training)
-);
-
-DROP TABLE IF EXISTS public.trainingxdiploma;
-
-CREATE TABLE IF NOT EXISTS public.trainingxdiploma
-(
-    id_diploma integer NOT NULL,
-    id_training integer NOT NULL,
-    CONSTRAINT trainingxdiploma_pkey PRIMARY KEY (id_diploma, id_training)
-);
-
-DROP TABLE IF EXISTS public.trainingxskill;
 
 CREATE TABLE IF NOT EXISTS public.trainingxskill
 (
     id_skill integer NOT NULL,
     id_training integer NOT NULL,
     granted_level integer,
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT trainingxskill_pkey PRIMARY KEY (id_skill, id_training)
 );
-
-DROP TABLE IF EXISTS public.validation_type;
 
 CREATE TABLE IF NOT EXISTS public.validation_type
 (
     id_validation serial NOT NULL,
     source character varying(50) COLLATE pg_catalog."default",
     denomination_validation character varying(50) COLLATE pg_catalog."default",
+    is_deleted boolean NOT NULL DEFAULT false,
     CONSTRAINT validation_type_pkey PRIMARY KEY (id_validation)
 );
 
@@ -396,6 +317,13 @@ ALTER TABLE IF EXISTS public.provide
     ON DELETE NO ACTION;
 
 
+ALTER TABLE IF EXISTS public.role
+    ADD CONSTRAINT role_id_access_level_fkey FOREIGN KEY (id_access_level)
+    REFERENCES public.access_level (id_access_level) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+
 ALTER TABLE IF EXISTS public.skill_validation
     ADD CONSTRAINT skill_validation_id_employee_fkey FOREIGN KEY (id_employee)
     REFERENCES public.employee (id_employee) MATCH SIMPLE
@@ -425,6 +353,20 @@ ALTER TABLE IF EXISTS public.skill_validation
 
 
 ALTER TABLE IF EXISTS public.training
+    ADD CONSTRAINT training_id_certification_fkey FOREIGN KEY (id_certification)
+    REFERENCES public.certification (id_certification) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+
+ALTER TABLE IF EXISTS public.training
+    ADD CONSTRAINT training_id_diploma_fkey FOREIGN KEY (id_diploma)
+    REFERENCES public.diploma (id_diploma) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+
+ALTER TABLE IF EXISTS public.training
     ADD CONSTRAINT training_id_domaine_fkey FOREIGN KEY (id_domaine)
     REFERENCES public.domaine (id_domaine) MATCH SIMPLE
     ON UPDATE NO ACTION
@@ -448,34 +390,6 @@ ALTER TABLE IF EXISTS public.training_request
 ALTER TABLE IF EXISTS public.training_request
     ADD CONSTRAINT training_request_id_validator_fkey FOREIGN KEY (id_validator)
     REFERENCES public.employee (id_employee) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
-
-
-ALTER TABLE IF EXISTS public.trainingxcertification
-    ADD CONSTRAINT trainingxcertification_id_certification_fkey FOREIGN KEY (id_certification)
-    REFERENCES public.certification (id_certification) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
-
-
-ALTER TABLE IF EXISTS public.trainingxcertification
-    ADD CONSTRAINT trainingxcertification_id_training_fkey FOREIGN KEY (id_training)
-    REFERENCES public.training (id_training) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
-
-
-ALTER TABLE IF EXISTS public.trainingxdiploma
-    ADD CONSTRAINT trainingxdiploma_id_diploma_fkey FOREIGN KEY (id_diploma)
-    REFERENCES public.diploma (id_diploma) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
-
-
-ALTER TABLE IF EXISTS public.trainingxdiploma
-    ADD CONSTRAINT trainingxdiploma_id_training_fkey FOREIGN KEY (id_training)
-    REFERENCES public.training (id_training) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION;
 

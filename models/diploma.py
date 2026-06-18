@@ -21,4 +21,4 @@ class Diploma(Base):
     domaine = relationship("Domaine", back_populates="diplomas")
     employees = relationship("EmployeeDiploma", back_populates="diploma")
     skill_links = relationship("DiplomaSkill", back_populates="diploma")
-    training_links = relationship("TrainingDiploma", back_populates="diploma")
+    trainings = relationship("Training",back_populates="diploma")

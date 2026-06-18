@@ -204,6 +204,7 @@ class TrainingRequestController():
             match status_choice:
                 case 1:
                     new_status = TRAININGREQUESTSTATUS.VALIDATED.value
+                    # Should put a service here to link to an existing formation. 
                 case 2:
                     new_status = TRAININGREQUESTSTATUS.REFUSED.value
                     reason = menu.get_reason()

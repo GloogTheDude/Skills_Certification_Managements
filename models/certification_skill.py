@@ -20,4 +20,4 @@ class CertificationSkill(Base):
                                     )
     certification = relationship("Certification", back_populates="skill_links")
     skill = relationship("Skill", back_populates="certification_links")
-    trainings = relationship("Training", back_populates="certification")
+    
