@@ -1,6 +1,9 @@
+from core.database import SessionLocal
 from models.employee import Employee
 from menus.employee_menu import EmployeeMenu
+from db.repositories.skills_repository import SkillRepository
 from services.skill_service import SkillService
+from db.repositories.certification_repository import CertificationRepository
 from services.certification_service import CertificationService
 from services.training_service import TrainingService
 from db.repositories.training_repository import TrainingRepository
@@ -11,16 +14,8 @@ from menus.validation_request_menu import ValidationRequestMenu
 from core.constants import TRAININGREQUESTSTATUS
 from controllers.training_request_controller import TrainingRequestController
 class ManagerController():
-    def __init__(self,manager: EmployeeDTO,
-                 skill_service: SkillService, 
-                 certification_service:CertificationService,
-                 training_service: TrainingService,
-                 training_request_service: TrainingRequestService):
+    def __init__(self,manager: EmployeeDTO):
         self.manager = manager
-        self.skill_service = skill_service
-        self.certification_service=certification_service
-        self.training_service = training_service
-        self.training_request_service = training_request_service
         self.training_request_controller = TrainingRequestController(self.manager)
 
     def get_main_manager_menu(self):
@@ -31,10 +26,16 @@ class ManagerController():
             user_choice = mm.main_menu()
             match user_choice:
                 case 1: #1. see skills
-                    skills= self.skill_service.get_skill_employee(self.manager.id_employee)
+                    with SessionLocal() as session:
+                        repo = SkillRepository(session)
+                        service = SkillService(repo)
+                        skills= service.get_skill_employee(self.manager.id_employee)
                     em.display_skills(skills_employee=skills)
                 case 2: 
-                    certifications_employee = self.certification_service.fetch_certification_employee(self.manager.id_employee)
+                    with SessionLocal() as session:
+                        repo = CertificationRepository(session)
+                        service = CertificationService(repo)
+                        certifications_employee = service.fetch_certification_employee(self.manager.id_employee)
                     em.display_certification(certifications_employee)
                 case 3: #3. ask for training
                     self.training_request_controller.get_training_request_menu()

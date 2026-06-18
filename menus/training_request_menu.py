@@ -86,7 +86,10 @@ class TrainingRequestMenu():
             print("=======================================================")
             print("select one you want to attempt or press (0) to leave:")
             user_choice = int(input("your choice: "))
-        return user_choice
+        
+        if user_choice == 0:
+            return None
+        return user_choice-1
         
     def request_personalised_training(self):
         print("You are asking for a personalised request, please enter the kind of extra-training you wish to follow:")
