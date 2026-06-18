@@ -181,3 +181,40 @@ class TrainingRequestController():
                     reason,
                     manager.id_employee,
                 )
+    
+    def manage_pending_requests_for_hr(self, hr:EmployeeDTO):
+        menu = ValidationRequestMenu()
+        pending_requests=[]
+        while True:
+            with SessionLocal() as session:
+                repo = TrainingRequestRepository(session)
+                service= TrainingRequestService(repo)
+                pending_requests = service.get_pending_request_for_hr()
+
+            selected_request = menu.select_pending_request_to_update(pending_requests)
+
+            if selected_request is None:
+                return
+            
+            status_choice = menu.select_new_request_status()
+            if status_choice == 0:
+                return
+            reason = None
+
+            match status_choice:
+                case 1:
+                    new_status = TRAININGREQUESTSTATUS.VALIDATED.value
+                case 2:
+                    new_status = TRAININGREQUESTSTATUS.REFUSED.value
+                    reason = menu.get_reason()
+                case _:
+                    return
+            with SessionLocal() as session:
+                repo = TrainingRequestRepository(session)
+                service= TrainingRequestService(repo)
+                service.update_request_status(
+                    selected_request.id_training_request,
+                    new_status,
+                    reason,
+                    hr.id_employee,
+                )

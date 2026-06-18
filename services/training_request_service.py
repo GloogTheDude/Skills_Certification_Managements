@@ -110,5 +110,30 @@ class TrainingRequestService():
             result.append(dto)
         return result
 
+    def get_pending_request_for_hr(self)->list[PendingTrainingRequestForManagerDTO]:
+        rows = self.training_request_repository.get_pending_request_for_hr()
+        result =[]
+        for tr, employee, training, domaine_name in rows:
+            dto = PendingTrainingRequestForManagerDTO(
+                id_training_request=tr.id_training_request,
+                request_desc=tr.request_desc,
+
+                status=tr.status,
+                reason=tr.reason,
+                requested_at=tr.requested_at,
+
+                id_employee=tr.id_employee,
+                first_name_employee = employee.first_name,
+                last_name_employee= employee.last_name,
+                id_training=tr.id_training,
+                #id_validator=tr.id_validator,
+
+                training_title= training.title if isinstance(training, Training) else None,
+                domaine_name=domaine_name,
+            )
+            result.append(dto)
+        return result
+
+
     def update_request_status(self, id_request, status, reason, id_validator ):
         self.training_request_repository.update_request_status(id_request, status, reason, id_validator )

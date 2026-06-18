@@ -64,6 +64,25 @@ class TrainingRequestRepository():
         )
 
         return self.session.execute(stmt).all()
+    
+    def get_pending_request_for_hr(self):
+        stmt = (
+            select(
+                TrainingRequest,
+                Employee,
+                Training,
+                Domaine.nom_domaine,
+            )
+            .join(TrainingRequest.employee)
+            .outerjoin(TrainingRequest.training)
+            .outerjoin(Training.domaine)
+            .where(
+                TrainingRequest.status == "pending",
+                TrainingRequest.is_deleted.is_(False),
+            )
+        )
+
+        return self.session.execute(stmt).all()
 
     def update_request_status(self, id_request: int,
                                 status: str,
