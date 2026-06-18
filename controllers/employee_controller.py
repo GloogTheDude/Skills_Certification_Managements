@@ -33,10 +33,10 @@ class EmployeeController():
                     certifications_employee = self.certification_service.fetch_certification_employee(self.employee.id_employee)
                     em.display_certification(certifications_employee)
                 case 3: #3. ask for training
-                    trc = TrainingRequestController(self.training_service, self.training_request_service, self.employee)
+                    trc = TrainingRequestController(self.employee)
                     trc.get_training_request_menu()
                 case 4:
-                    trc = TrainingRequestController(self.training_service, self.training_request_service, self.employee)
+                    trc = TrainingRequestController(self.employee)
                     trc.follow_up_request()
                 case 0:
                     return 

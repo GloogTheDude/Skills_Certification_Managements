@@ -7,7 +7,7 @@ class TrainingService():
     def __init__(self, training_repository:TrainingRepository):
         self.training_repository  = training_repository
     
-    def fetch_available_training(self, employee_id:int):
+    def fetch_available_training(self, employee_id:int)->dict[int:TrainingSummaryDTO]:
         results = self.training_repository.get_future_trainings(employee_id)
         trainings:dict[int: TrainingSummaryDTO] = {}
         i=1

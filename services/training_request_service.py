@@ -2,6 +2,7 @@ from db.repositories.training_request_repository import TrainingRequestRepositor
 from dto.training_dto import TrainingSummaryDTO
 from models.training_request import TrainingRequest
 from models.employee import Employee
+from models.training import Training
 from core.constants import TRAININGREQUESTSTATUS
 from datetime import datetime, date
 from dto.training_request_dto import TrainingRequestDTO, PendingTrainingRequestForManagerDTO
@@ -103,7 +104,7 @@ class TrainingRequestService():
                 id_training=tr.id_training,
                 #id_validator=tr.id_validator,
 
-                training_title=training.title,
+                training_title= training.title if isinstance(training, Training) else None,
                 domaine_name=domaine_name,
             )
             result.append(dto)

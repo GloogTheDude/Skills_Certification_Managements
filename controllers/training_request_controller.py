@@ -1,45 +1,58 @@
+from core.database import SessionLocal
 from services.training_service import TrainingService
 from models.employee import Employee
 from menus.training_request_menu import TrainingRequestMenu
 from menus.validation_request_menu import ValidationRequestMenu
 from services.training_request_service import TrainingRequestService
+from db.repositories.training_request_repository import TrainingRequestRepository
+from db.repositories.training_repository import TrainingRepository
 from dto.employee_dto import EmployeeDTO
 from core.constants import TRAININGREQUESTSTATUS
-
+from dto.training_dto import TrainingSummaryDTO
 
 class TrainingRequestController():
     
-    def __init__(self, training_service:TrainingService, training_request_service: TrainingRequestService,employee: EmployeeDTO):
-        self.training_service = training_service
+    def __init__(self,employee: EmployeeDTO):
         self.employee = employee
-        self.training_request_service = training_request_service
         self.training_request_menu = TrainingRequestMenu()
 
     def get_training_request_menu(self):
-        
         domaine_filter = set()
         user_choice = -1
-        while user_choice !=0:
-            trainings_availables = self.training_service.fetch_available_training(self.employee.id_employee)
+
+        while user_choice != 0:
+            trainings_availables = self.fetch_available_training()
             user_choice = self.training_request_menu.main_menu()
-            print(f"in controler user_choice = {user_choice}")
+
             match user_choice:
                 case 0:
                     return
                 case 1:
-                    print("case 1")
-                    self.see_all_info(self.training_request_menu,trainings_availables,domaine_filter)
+                    self.see_all_info(
+                        trainings_availables,
+                        domaine_filter
+                    )
                 case 2:
-                    self.select_preplaned_training(trainings_availables,
-                                                   domaine_filter)
+                    self.select_preplaned_training(
+                        trainings_availables,
+                        domaine_filter
+                    )
                 case 3:
                     self.make_personalised_request()
                 case 4:
                     self.follow_up_request()
 
+    def fetch_available_training(self):
+        with SessionLocal() as session:
+            repo = TrainingRepository(session)
+            service = TrainingService(repo)
+
+            return service.fetch_available_training(self.employee.id_employee)
+
     def see_all_info(self, 
-                    trainings_availables:dict, 
+                    trainings_availables:dict[int, TrainingSummaryDTO], 
                     domaine_filter:set):
+    
         user_choice = -1
         while not (0<=user_choice<=3):
             user_choice = self.training_request_menu.see_all_formation(trainings=trainings_availables,
@@ -57,7 +70,11 @@ class TrainingRequestController():
                     self.make_personalised_request()
     
     def add_domaine_to_filter(self, trainings_availables:dict,domaine_filter:set):
-        domaines:set = self.training_service.filter_dto_by_domaine_name(trainings_availables,domaine_filter)
+        with SessionLocal() as session:
+            repo = TrainingRepository(session)
+            service = TrainingService(repo)
+            domaines:set = service.filter_dto_by_domaine_name(trainings_availables,domaine_filter)
+        
         while domaines:
             domaine = self.training_request_menu.add_filter_domaine_menu(domaines)
             if domaine is None:
@@ -84,61 +101,67 @@ class TrainingRequestController():
             match user_input:
                 case 0:
                     return
-                case 1: self.add_domaine_to_filter(self.training_request_menu, 
-                                                trainings_availables,
-                                                domaine_filter)
-                case 2: self.remove_domaine_from_filter(self.training_request_menu,
-                                                domaine_filter)
+                case 1: 
+                    self.add_domaine_to_filter(trainings_availables,domaine_filter)
+                case 2: 
+                    self.remove_domaine_from_filter(domaine_filter)
 
+    def select_preplaned_training(self, trainings_availables, domaine_filter):
+        selected_training = self.training_request_menu.request_place_to_planned_training(
+            trainings_availables,
+            domaine_filter
+        )
 
+        if selected_training is None:
+            return
 
-    def select_preplaned_training(self,trainings_availables:dict,domaine_filter:set):
-        user_choice = -1
-        while not (0<=user_choice<=len(trainings_availables)+1):
-            user_choice = self.training_request_menu.request_place_to_planned_training(
-                                                                trainings=trainings_availables,
-                                                                filter= domaine_filter)
-        if user_choice == 0:
-            return None
+        with SessionLocal() as session:
+            repo = TrainingRequestRepository(session)
+            service = TrainingRequestService(repo)
+
+            try:
+                service.call_add_request_preplanned_training(self.employee, selected_training)
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
         
-        print(f"You asked to follow :{trainings_availables[user_choice].title}")
-        self.training_request_service.call_add_request_preplanned_training(self.employee,trainings_availables[user_choice])
-    
-
-    
     def make_personalised_request(self):
         request_desc = self.training_request_menu.personalised_training_request_menu()
-        self.training_request_service.call_add_request_personalised_training(self.employee,request_desc)
+        with SessionLocal() as session:
+            repo = TrainingRequestRepository(session)
+            service = TrainingRequestService(repo)
+            service.call_add_request_personalised_training(self.employee,request_desc)
 
     def follow_up_request(self):
-        print("FOLLOW UP")
-        employee_requests=self.training_request_service.get_employee_request(self.employee)
+        with SessionLocal() as session:
+            repo = TrainingRequestRepository(session)
+            service = TrainingRequestService(repo)
+            employee_requests = service.get_employee_request(self.employee)
+
         while True:
-            print("WHILE")
             user_choice = self.training_request_menu.display_employee_requests(employee_requests)
             if user_choice is None:
                 return
             self.training_request_menu.display_employee_request_details(user_choice)
 
     def manage_pending_requests_for_manager(self, manager: EmployeeDTO):
-        print("manage_pending_requests_for_manager")
         menu = ValidationRequestMenu()
-
+        pending_requests=[]
         while True:
-            pending_requests = self.training_request_service.get_pending_request_for_manager(
-                manager.id_employee
-            )
+            with SessionLocal() as session:
+                repo = TrainingRequestRepository(session)
+                service= TrainingRequestService(repo)
+                pending_requests = service.get_pending_request_for_manager(manager.id_employee)
 
             selected_request = menu.select_pending_request_to_update(pending_requests)
 
             if selected_request is None:
                 return
-
+            
             status_choice = menu.select_new_request_status()
-
             if status_choice == 0:
                 return
-
             reason = None
 
             match status_choice:
@@ -149,10 +172,12 @@ class TrainingRequestController():
                     reason = menu.get_reason()
                 case _:
                     return
-
-            self.training_request_service.update_request_status(
-                selected_request.id_training_request,
-                new_status,
-                reason,
-                manager.id_employee,
-            )
+            with SessionLocal() as session:
+                repo = TrainingRequestRepository(session)
+                service= TrainingRequestService(repo)
+                service.update_request_status(
+                    selected_request.id_training_request,
+                    new_status,
+                    reason,
+                    manager.id_employee,
+                )

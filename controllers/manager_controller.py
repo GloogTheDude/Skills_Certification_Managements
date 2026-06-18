@@ -2,7 +2,6 @@ from models.employee import Employee
 from menus.employee_menu import EmployeeMenu
 from services.skill_service import SkillService
 from services.certification_service import CertificationService
-from controllers.training_request_controller import TrainingRequestController
 from services.training_service import TrainingService
 from db.repositories.training_repository import TrainingRepository
 from services.training_request_service import TrainingRequestService
@@ -22,7 +21,7 @@ class ManagerController():
         self.certification_service=certification_service
         self.training_service = training_service
         self.training_request_service = training_request_service
-        self.training_request_controller = TrainingRequestController(self.training_service, self.training_request_service, self.manager)
+        self.training_request_controller = TrainingRequestController(self.manager)
 
     def get_main_manager_menu(self):
         em = EmployeeMenu()
@@ -38,11 +37,9 @@ class ManagerController():
                     certifications_employee = self.certification_service.fetch_certification_employee(self.manager.id_employee)
                     em.display_certification(certifications_employee)
                 case 3: #3. ask for training
-                    trc = TrainingRequestController(self.training_service, self.training_request_service, self.manager)
-                    trc.get_training_request_menu()
+                    self.training_request_controller.get_training_request_menu()
                 case 4:
-                    trc = TrainingRequestController(self.training_service, self.training_request_service, self.manager)
-                    trc.follow_up_request()
+                    self.training_request_controller.follow_up_request()
                 case 5:
                     #subordonate request to (in)validate
                     print("choice 5!")
