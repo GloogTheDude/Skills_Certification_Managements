@@ -27,18 +27,20 @@ class ParticipationRepository():
         )
         return self.session.scalars(stmt).all()
     
-    def get_details_by_status(self, status, max_end_date:date|None = None):
+    def get_details_by_status(self, status, min_end_date:date|None = None)->tuple[Participation,Employee,Training]:
         conditions = [
             Participation.status == status,
             Participation.is_deleted.is_(False),
             Employee.is_deleted.is_(False),
             Training.is_deleted.is_(False)
         ]
-        if max_end_date is not None:
-            conditions.append(Training.end_ <= max_end_date)
+        if min_end_date is not None:
+            conditions.append(Training.end_ <= min_end_date)
         stmt = (
             select(...)
             .where(*conditions)
         )
         return self.session.execute(stmt).all()
+    
+
     

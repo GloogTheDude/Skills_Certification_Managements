@@ -11,5 +11,5 @@ class ParticipationDTO:
     training_title: str
     training_start:date
     training_end:date
-    
+
     participation_status: str
