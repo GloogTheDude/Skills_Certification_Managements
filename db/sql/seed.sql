@@ -248,35 +248,81 @@ INSERT INTO public.employeexcertification (id_employee_certification, id_employe
 (12, 14, 7, '2026-04-08', '2026-04-12', '2029-04-12', 'OpenClassrooms', 'passed', 'docs/certifications/noah_powerbi.pdf', false);
 
 -- Participations
-INSERT INTO public.participation (id_employee, id_training, status, is_deleted) VALUES
-(4, 1, 'completed', false), (4, 2, 'completed', false), (4, 3, 'completed', false), (4, 9, 'planned', false),
-(5, 1, 'completed', false), (5, 9, 'completed', false), (5, 10, 'planned', false),
-(6, 2, 'completed', false), (6, 4, 'planned', false), (6, 11, 'in_progress', false),
-(7, 7, 'completed', false), (7, 8, 'planned', false),
-(8, 7, 'failed', false), (8, 12, 'planned', false),
-(9, 6, 'completed', false), (9, 5, 'planned', false),
-(10, 10, 'completed', false), (10, 1, 'planned', false),
-(11, 1, 'planned', false), (11, 12, 'completed', false),
-(12, 4, 'completed', false), (12, 5, 'completed', false), (12, 10, 'completed', false),
-(13, 6, 'completed', false), (13, 5, 'planned', false),
-(14, 7, 'completed', false), (14, 2, 'planned', false);
+INSERT INTO public.participation
+(id_employee, id_training, status, is_deleted)
+VALUES
+(4, 1, 'COMPLETED', false),
+(4, 2, 'COMPLETED', false),
+(4, 3, 'COMPLETED', false),
+
+(5, 1, 'COMPLETED', false),
+(5, 9, 'COMPLETED', false),
+(5, 10, 'REGISTERED', false),
+
+(6, 2, 'COMPLETED', false),
+(6, 4, 'REGISTERED', false),
+(6, 11, 'IN_PROGRESS', false),
+
+(7, 7, 'COMPLETED', false),
+(7, 8, 'REGISTERED', false),
+
+(8, 7, 'FAILED', false),
+(8, 12, 'REGISTERED', false),
+
+(9, 6, 'COMPLETED', false),
+(9, 5, 'REGISTERED', false),
+
+(10, 10, 'COMPLETED', false),
+
+(11, 1, 'REGISTERED', false),
+(11, 12, 'COMPLETED', false),
+
+(12, 4, 'COMPLETED', false),
+(12, 5, 'COMPLETED', false),
+(12, 10, 'COMPLETED', false),
+
+(13, 6, 'COMPLETED', false),
+
+(14, 7, 'COMPLETED', false);
 
 -- Training requests
-INSERT INTO public.training_request (id_training_request, status, reason, requested_at, is_deleted, id_employee, id_training, id_validator) VALUES
-(1, 'approved', 'Backend onboarding', '2025-12-20', false, 4, 1, 2),
-(2, 'approved', 'Need stronger SQL', '2026-01-15', false, 4, 2, 2),
-(3, 'approved', 'ORM project need', '2026-01-30', false, 4, 3, 2),
-(4, 'pending', 'API design improvement', '2026-05-01', false, 4, 9, 2),
-(5, 'approved', 'Team backend standard', '2025-12-22', false, 5, 1, 2),
-(6, 'approved', 'Reporting needs', '2026-03-20', false, 7, 7, 3),
-(7, 'rejected', 'Budget limit', '2026-03-21', false, 8, 7, 3),
-(8, 'approved', 'Security compliance', '2026-03-01', false, 9, 6, 2),
-(9, 'pending', 'Junior onboarding', '2026-05-25', false, 10, 1, 4),
-(10, 'approved', 'DevOps basics', '2026-02-20', false, 12, 4, 2),
-(11, 'approved', 'Internal communication', '2026-06-01', false, 11, 12, 5),
-(12, 'pending', 'Network basics', '2026-06-05', false, 13, 5, 9),
-(13, 'pending', 'SQL analysis', '2026-06-06', false, 14, 2, 3),
-(14, 'cancelled', 'Employee inactive', '2026-01-10', true, 15, 1, 2);
+INSERT INTO public.training_request
+(
+    id_training_request,
+    status,
+    reason,
+    requested_at,
+    is_deleted,
+    id_employee,
+    id_training,
+    id_validator
+)
+VALUES
+(1, 'VALIDATED', 'Backend onboarding', '2025-12-20', false, 4, 1, 2),
+(2, 'VALIDATED', 'Need stronger SQL', '2026-01-15', false, 4, 2, 2),
+(3, 'VALIDATED', 'ORM project need', '2026-01-30', false, 4, 3, 2),
+
+(4, 'PENDING', 'API design improvement', '2026-05-01', false, 4, 9, NULL),
+
+(5, 'VALIDATED', 'Team backend standard', '2025-12-22', false, 5, 1, 2),
+
+(6, 'VALIDATED', 'Reporting needs', '2026-03-20', false, 7, 7, 3),
+
+(7, 'REFUSED', 'Budget limit', '2026-03-21', false, 8, 7, 3),
+
+(8, 'VALIDATED', 'Security compliance', '2026-03-01', false, 9, 6, 2),
+
+(9, 'PENDING', 'Junior onboarding', '2026-05-25', false, 10, 1, NULL),
+
+(10, 'VALIDATED', 'DevOps basics', '2026-02-20', false, 12, 4, 2),
+
+(11, 'VALIDATED', 'Internal communication', '2026-06-01', false, 11, 12, 5),
+
+(12, 'PENDING', 'Network basics', '2026-06-05', false, 13, 5, NULL),
+
+(13, 'PENDING', 'SQL analysis', '2026-06-06', false, 14, 2, NULL),
+
+(14, 'CANCELLED', 'Employee inactive', '2026-01-10', true, 15, 1, 2);
 
 -- Skill validations
 INSERT INTO public.skill_validation (id_skill_validation, date_, level_skill, id_validation, id_employee, id_validator, id_skill, is_deleted) VALUES

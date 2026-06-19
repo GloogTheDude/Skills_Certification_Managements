@@ -1,7 +1,14 @@
 from enum import Enum
 
 class TRAININGREQUESTSTATUS(Enum):
-    PENDING = "pending"
-    VALIDATED ="validated"
-    REFUSED = "refused"
-    
+    PENDING = "PENDING"
+    VALIDATED ="VALIDATED"
+    REFUSED = "REFUSED"
+
+class PARTICIPATIONSTATUS(Enum):
+    REGISTERED = "REGISTERED"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    ABSENT = "ABSENT"
+    CANCELLED = "CANCELLED"

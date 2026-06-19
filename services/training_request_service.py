@@ -1,17 +1,20 @@
 from db.repositories.training_request_repository import TrainingRequestRepository
+from db.repositories.participation_repository import ParticipationRepository
 from dto.training_dto import TrainingSummaryDTO
 from models.training_request import TrainingRequest
 from models.employee import Employee
+from models.participation import Participation
 from models.training import Training
-from core.constants import TRAININGREQUESTSTATUS
+from core.constants import TRAININGREQUESTSTATUS, PARTICIPATIONSTATUS
 from datetime import datetime, date
 from dto.training_request_dto import TrainingRequestDTO, PendingTrainingRequestForManagerDTO
 from dto.employee_dto import EmployeeDTO
 
 class TrainingRequestService():
 
-    def __init__(self, training_request_repository:TrainingRequestRepository):
+    def __init__(self, training_request_repository:TrainingRequestRepository, participation_repository:ParticipationRepository=None):
         self.training_request_repository= training_request_repository
+        self.participation_repository= participation_repository
     
     from datetime import date
 
@@ -135,5 +138,36 @@ class TrainingRequestService():
         return result
 
 
-    def update_request_status(self, id_request, status, reason, id_validator ):
-        self.training_request_repository.update_request_status(id_request, status, reason, id_validator )
+    def refuse_request(self, id_request, reason, id_validator ):
+        self.training_request_repository.update_request_status(id_request, TRAININGREQUESTSTATUS.REFUSED.value, reason, id_validator)
+
+    def validate_training_request(
+        self,
+        request_id: int,
+        validator_id: int,
+        training_id: int | None = None,
+    ):
+        request = self.training_request_repository.get_by_id(request_id)
+
+        if request is None:
+            raise ValueError("Training request not found")
+
+        if request.status != TRAININGREQUESTSTATUS.PENDING.value:
+            raise ValueError("Request is not pending")
+
+        if request.id_training is None:
+            if training_id is None:
+                raise ValueError("Personalized request must be linked to a training")
+
+            request.id_training = training_id
+
+        request.status = TRAININGREQUESTSTATUS.VALIDATED.value
+        request.id_validator = validator_id
+        request.reason = None
+
+        participation = Participation()
+        participation.id_employee = request.id_employee
+        participation.id_training = request.id_training
+        participation.status = PARTICIPATIONSTATUS.REGISTERED.value
+
+        self.participation_repository.add(participation)

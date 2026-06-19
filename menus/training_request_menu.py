@@ -77,19 +77,18 @@ class TrainingRequestMenu():
             user_choice = int(input("your choice: "))
         return user_choice
         
-    def request_place_to_planned_training(self, trainings:list[TrainingSummaryDTO], filter:set[str]=None):
+    def select_training_menu(self, trainings:list[TrainingSummaryDTO], filter:set[str]=None):
         user_choice=-1
-        print("menu : request_place_to_planned_training")
         while not(0<=user_choice <= len(trainings)+1) :
             print("===================TRAININGS===========================")
             self.display_training(trainings, filter)
             print("=======================================================")
-            print("select one you want to attempt or press (0) to leave:")
+            print("select one or press (0) to leave:")
             user_choice = int(input("your choice: "))
         
         if user_choice == 0:
             return None
-        return user_choice-1
+        return user_choice
         
     def request_personalised_training(self):
         print("You are asking for a personalised request, please enter the kind of extra-training you wish to follow:")

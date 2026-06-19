@@ -11,7 +11,7 @@ class TrainingService():
         results = self.training_repository.get_future_trainings(employee_id)
         trainings:dict[int: TrainingSummaryDTO] = {}
         i=1
-        print(f"****** {type(results)} - {results}********")
+        #print(f"****** {type(results)} - {results}********")
         for t,d in results:
             ts = TrainingSummaryDTO(
                     id_training=t.id_training,
@@ -33,7 +33,8 @@ class TrainingService():
 
         return domaines
     
-
+    def get_by_id(self, id_training):
+        return self.training_repository.get_by_id(id_training)
 
     
             

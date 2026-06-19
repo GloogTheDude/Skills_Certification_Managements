@@ -2,10 +2,13 @@ from sqlalchemy import select, func, or_, insert
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
+from core.constants import PARTICIPATIONSTATUS, TRAININGREQUESTSTATUS
+
 from models.training_request import TrainingRequest
 from models.training import Training
 from models.domaine import Domaine
 from models.employee import Employee
+from models.participation import Participation
 
 class TrainingRequestRepository():
     def __init__(self, session: Session):
@@ -57,7 +60,7 @@ class TrainingRequestRepository():
             .outerjoin(TrainingRequest.training)
             .outerjoin(Training.domaine)
             .where(
-                TrainingRequest.status == "pending",
+                TrainingRequest.status == TRAININGREQUESTSTATUS.PENDING.value,
                 TrainingRequest.is_deleted.is_(False),
                 Employee.id_manager == id_manager,
             )
@@ -77,7 +80,7 @@ class TrainingRequestRepository():
             .outerjoin(TrainingRequest.training)
             .outerjoin(Training.domaine)
             .where(
-                TrainingRequest.status == "pending",
+                TrainingRequest.status == TRAININGREQUESTSTATUS.PENDING.value,
                 TrainingRequest.is_deleted.is_(False),
             )
         )
@@ -110,3 +113,33 @@ class TrainingRequestRepository():
         self.session.refresh(request)
 
         return request
+    
+
+    def get_by_id(self, id_request):
+        return self.session.get(TrainingRequest, id_request)
+    
+    def create_participation(self, id_request: int,
+                                status: str,
+                                id_training: int,
+                                reason: str | None = None,
+                                id_validator: int | None = None) -> TrainingRequest | None:
+        
+        request = self.session.get(TrainingRequest, id_request)
+        training = self.session.get(Training, id_training)
+
+        if request is None:
+            return None
+        if request.is_deleted:
+            return None
+        if id_validator is None:
+            return None
+        if id_training is None:
+            return None
+        
+        request.status = status
+        request.reason = reason
+
+        participation = Participation()
+        participation.id_employee = request.id_employee
+        participation.id_training = training.id_training
+        participation.status = PARTICIPATIONSTATUS.REGISTERED

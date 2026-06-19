@@ -1,4 +1,6 @@
 from core.database import SessionLocal
+from db.repositories.participation_repository import ParticipationRepository
+from models.training import Training
 from services.training_service import TrainingService
 from models.employee import Employee
 from menus.training_request_menu import TrainingRequestMenu
@@ -9,7 +11,7 @@ from db.repositories.training_repository import TrainingRepository
 from dto.employee_dto import EmployeeDTO
 from core.constants import TRAININGREQUESTSTATUS
 from dto.training_dto import TrainingSummaryDTO
-
+from dto.training_request_dto import PendingTrainingRequestForManagerDTO
 class TrainingRequestController():
     
     def __init__(self,employee: EmployeeDTO):
@@ -107,13 +109,15 @@ class TrainingRequestController():
                     self.remove_domaine_from_filter(domaine_filter)
 
     def select_preplaned_training(self, trainings_availables, domaine_filter):
-        selected_training = self.training_request_menu.request_place_to_planned_training(
+        selected_index = self.training_request_menu.select_training_menu(
             trainings_availables,
             domaine_filter
         )
 
-        if selected_training is None:
+        if selected_index is None:
             return
+    
+        selected_training = trainings_availables[selected_index]
 
         with SessionLocal() as session:
             repo = TrainingRequestRepository(session)
@@ -166,21 +170,25 @@ class TrainingRequestController():
 
             match status_choice:
                 case 1:
-                    new_status = TRAININGREQUESTSTATUS.VALIDATED.value
+                    selected_training_id = selected_request.id_training
+
+                    if selected_training_id is None:
+                        selected_training_id = self.ask_training_to_link()
+
+                    self.validate_training_request(
+                        selected_request,
+                        manager,
+                        selected_training_id,
+    )
                 case 2:
-                    new_status = TRAININGREQUESTSTATUS.REFUSED.value
                     reason = menu.get_reason()
+                    self.refuse_request(
+                        selected_request.id_training_request,
+                        manager.id_employee,
+                        reason,
+                    )
                 case _:
                     return
-            with SessionLocal() as session:
-                repo = TrainingRequestRepository(session)
-                service= TrainingRequestService(repo)
-                service.update_request_status(
-                    selected_request.id_training_request,
-                    new_status,
-                    reason,
-                    manager.id_employee,
-                )
     
     def manage_pending_requests_for_hr(self, hr:EmployeeDTO):
         menu = ValidationRequestMenu()
@@ -203,19 +211,58 @@ class TrainingRequestController():
 
             match status_choice:
                 case 1:
-                    new_status = TRAININGREQUESTSTATUS.VALIDATED.value
-                    # Should put a service here to link to an existing formation. 
+                    selected_training_id = selected_request.id_training
+
+                    if selected_training_id is None:
+                        selected_training_id = self.ask_training_to_link()
+
+                    self.validate_training_request(
+                        selected_request,
+                        hr,
+                        selected_training_id)
                 case 2:
-                    new_status = TRAININGREQUESTSTATUS.REFUSED.value
                     reason = menu.get_reason()
+                    self.refuse_request(
+                        selected_request.id_training_request,
+                        hr.id_employee,
+                        reason)
                 case _:
                     return
-            with SessionLocal() as session:
-                repo = TrainingRequestRepository(session)
-                service= TrainingRequestService(repo)
-                service.update_request_status(
+    
+    def validate_training_request(self, selected_request:PendingTrainingRequestForManagerDTO,
+                                  hr:EmployeeDTO, 
+                                  selected_training_id:int):
+        with SessionLocal() as session:
+            request_repo = TrainingRequestRepository(session)
+            participation_repo = ParticipationRepository(session)
+
+            service = TrainingRequestService(
+                request_repo,
+                participation_repo,
+            )
+
+            try:
+                service.validate_training_request(
                     selected_request.id_training_request,
-                    new_status,
-                    reason,
                     hr.id_employee,
+                    selected_training_id,
                 )
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+    
+    def ask_training_to_link(self)->TrainingSummaryDTO:
+        availables_trainings = self.fetch_available_training()
+        index = self.training_request_menu.select_training_menu(availables_trainings)
+        return availables_trainings[index].id_training
+
+    def refuse_request(self, selected_request:PendingTrainingRequestForManagerDTO,
+                        validator:EmployeeDTO, 
+                        reason):
+        with SessionLocal() as session:
+            repo = TrainingRequestRepository(session)
+            service= TrainingRequestService(repo)
+            service.refuse_request(selected_request.id_training_request,
+                                    reason,
+                                    validator.id_employee)
