@@ -4,7 +4,12 @@ from sqlalchemy.orm import Session
 from models.training import Training
 from models.domaine import Domaine
 from models.training_request import TrainingRequest
+from models.training_skill import TrainingSkill
+from models.skill import Skill
+
 from datetime import date
+from dto.training_skill_dto import TrainingSkillDTO
+
 
 class TrainingRepository():
     def __init__(self, session: Session):
@@ -40,3 +45,16 @@ class TrainingRepository():
 
     def get_by_id(self, id_training)->Training:
         return self.session.get(Training, id_training)
+    
+    def get_skills_by_id_training(self, id_training)->tuple[Training,TrainingSkill,Skill]:
+        stmt = (
+            select(Training,
+                   TrainingSkill,
+                   Skill)
+                   .join(
+                       TrainingSkill.id_training == Training.id_training,
+                       Skill.id_skill == TrainingSkill.id_skill
+                   )
+                   .where(Training.id_training == id_training)
+        )
+        return self.session.execute(stmt).all()
