@@ -38,5 +38,5 @@ class TrainingRepository():
 
         return self.session.execute(stmt).all()
 
-    def get_by_id(self, id_training):
+    def get_by_id(self, id_training)->Training:
         return self.session.get(Training, id_training)

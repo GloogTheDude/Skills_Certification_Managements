@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, String,Boolean
+from sqlalchemy import ForeignKey, String,Boolean,Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
@@ -8,6 +8,7 @@ class Certification(Base):
 
     id_certification: Mapped[int] = mapped_column(primary_key=True)
     subject_certification: Mapped[str | None] = mapped_column(String(50))
+    validity_month: Mapped[int|None] = mapped_column(Integer, nullable=True)
     is_deleted: Mapped[bool] = mapped_column(
                                         Boolean,
                                         default=False,

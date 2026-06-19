@@ -33,8 +33,18 @@ class TrainingService():
 
         return domaines
     
-    def get_by_id(self, id_training):
+    def get_by_id(self, id_training:int)->Training:
         return self.training_repository.get_by_id(id_training)
+    
+    #should return if the trainign is associated with a diploma/certification and its id
+    #other whise you get None wich means that there's associations in TrainingXSkill
+    def get_training_type(self, id_training)-> tuple[str,int]|None: 
+        training = self.training_repository.get_by_id(id_training)
+        if training.id_diploma:
+            return ("diploma", training.id_diploma)
+        if training.id_certification:
+            return ("certification", training.id_certification)
+        return None 
 
     
             

@@ -144,3 +144,5 @@ class TrainingRequestMenu():
     def personalised_training_request_menu(self):
         request = input("Please ask us what you exeptect: ")
         return request
+    
+    
