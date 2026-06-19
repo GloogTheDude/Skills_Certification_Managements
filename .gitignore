@@ -22,3 +22,8 @@ alembic/versions/__pycache__/
 
 # OS
 .DS_Store
+
+
+#script
+
+reset_db.sh
