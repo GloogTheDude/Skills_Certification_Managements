@@ -42,5 +42,5 @@ class ParticipationRepository():
         )
         return self.session.execute(stmt).all()
     
-
+    
     

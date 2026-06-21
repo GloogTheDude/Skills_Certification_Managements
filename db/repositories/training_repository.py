@@ -46,7 +46,7 @@ class TrainingRepository():
     def get_by_id(self, id_training)->Training:
         return self.session.get(Training, id_training)
     
-    def get_skills_by_id_training(self, id_training)->tuple[Training,TrainingSkill,Skill]:
+    def get_skills_by_id_training(self, id_training) -> tuple[Training,TrainingSkill,Skill]:
         stmt = (
             select(Training,
                    TrainingSkill,
