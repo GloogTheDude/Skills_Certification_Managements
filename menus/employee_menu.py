@@ -1,5 +1,6 @@
 from dto.employee_skill_dto import EmployeeSkillDTO
 from dto.employee_certification_dto import EmployeeCertificationDTO
+from dto.skill_dto import SkillProfileDTO
 
 class EmployeeMenu():
     def __init__(self):
@@ -17,11 +18,11 @@ class EmployeeMenu():
             user_choice = int(input("Your choice: "))
         return user_choice
     
-    def display_skills(self,skills_employee: list[EmployeeSkillDTO]):
+    def display_skills(self,skills_employee: list[SkillProfileDTO]):
         print("===============YOUR SKILLS=================")
-        print(f"{'Skill':<12} | {'Level':<7}")
+        print(f"{'Skill':<12}|{'Level':<7}|{'From':<18}|Domaine")
         for es in skills_employee:
-            print(f"{es.skill_name:<12} | {es.level:<7}")
+            print(f"{es.skill_name:<12}|{es.displayed_level:<7}|{es.primary_source.source_type:<18}|{es.skill_domaine}")
         print("===========================================")
     
     

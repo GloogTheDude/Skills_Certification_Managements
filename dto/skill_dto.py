@@ -16,6 +16,7 @@ class SkillSourceDTO:
 class SkillProfileDTO:
     skill_id: int
     skill_name: str
+    skill_domaine:str
     displayed_level: int
     primary_source: SkillSourceDTO | None
     sources: list[SkillSourceDTO]

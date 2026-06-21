@@ -1,4 +1,5 @@
 from core.database import SessionLocal
+from db.repositories.acquisition_skill_repository import AcquisitionSkillRepository
 from models.employee import Employee
 from menus.employee_menu import EmployeeMenu
 from db.repositories.skills_repository import SkillRepository
@@ -25,8 +26,10 @@ class EmployeeController():
                 case 1: #1. see skills
                     with SessionLocal() as session:
                         repo = SkillRepository(session)
-                        service = SkillService(repo)
-                        skills= service.get_skill_employee(self.employee.id_employee)
+                        acquisitionRepo = AcquisitionSkillRepository(session)
+                        service = SkillService(repo, acquisitionRepo)
+                        skills= service.get_acquired_skills(self.employee.id_employee)
+
                     em.display_skills(skills_employee=skills)
                 case 2: 
                     with SessionLocal() as session:

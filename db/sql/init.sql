@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS public.certification
     subject_certification character varying(50) COLLATE pg_catalog."default",
     is_deleted boolean NOT NULL DEFAULT false,
     id_domaine integer NOT NULL,
+    validity_month integer,
     CONSTRAINT certification_pkey PRIMARY KEY (id_certification)
 );
 
@@ -136,6 +137,7 @@ CREATE TABLE IF NOT EXISTS public.skill
     id_skill serial NOT NULL,
     name_skill character varying(50) COLLATE pg_catalog."default",
     is_deleted boolean NOT NULL DEFAULT false,
+    id_domaine integer,
     CONSTRAINT skill_pkey PRIMARY KEY (id_skill)
 );
 
@@ -320,6 +322,13 @@ ALTER TABLE IF EXISTS public.provide
 ALTER TABLE IF EXISTS public.role
     ADD CONSTRAINT role_id_access_level_fkey FOREIGN KEY (id_access_level)
     REFERENCES public.access_level (id_access_level) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+
+ALTER TABLE IF EXISTS public.skill
+    ADD CONSTRAINT skill_id_domaine_fkey FOREIGN KEY (id_domaine)
+    REFERENCES public.domaine (id_domaine) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION;
 

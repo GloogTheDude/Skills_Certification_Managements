@@ -30,22 +30,29 @@ class SkillService():
             for skill, level in result]
     
 
-    def get_acquired_skills(self, id_employee):
+    def get_acquired_skills(self, id_employee)->list[SkillProfileDTO]:
+        print(f"id_employee = {id_employee}")
         training_skills = self.acquisition_skill_repository.get_trainingskills_by_id_employee(id_employee)
         certification_skills = self.acquisition_skill_repository.get_certificationskill_by_id_employee(id_employee)
         diploma_skills = self.acquisition_skill_repository.get_diplomeskills_by_id_employee(id_employee)
         validated_skills = self.acquisition_skill_repository.get_validationskill_by_id_employee(id_employee)
+        print(f"len(training_skills)={len(training_skills)}")
+        print(f"len(certification_skills)={len(certification_skills)}")
+        print(f"len(diploma_skills)={len(diploma_skills)}")
+        print(f"len(validated_skills)={len(validated_skills)}")
         dict_dto={}
         self.get_skillsourcedto_from_training_skill(training_skills, dict_dto)
         self.get_skillsourcedto_from_certification_skill(certification_skills, dict_dto)
         self.get_skillsourcedto_from_diploma_skill(diploma_skills, dict_dto)
         self.get_skillsourcedto_from_validated_skill(validated_skills, dict_dto)
+        print(dict_dto)
+        print(list(dict_dto.values()))
         return list(dict_dto.values())
 
     
     def get_skillsourcedto_from_training_skill(self, training_skills: list[tuple[Training, TrainingSkill, Skill]],
                             dict_dto: dict[int, SkillProfileDTO]):
-        for training, training_skill, skill, in training_skills:
+        for training, training_skill, skill,domaine in training_skills:
             source = SkillSourceDTO(
                 source_type=SKILLSOURCETYPE.TRAINING.value,
                 source_id=training.id_training,
@@ -55,11 +62,11 @@ class SkillService():
                 expires_at=None
             )
 
-            self.push_into_dict(source,skill, dict_dto)
+            self.push_into_dict(source,skill, dict_dto, domaine)
     
     def get_skillsourcedto_from_certification_skill(self, certification_skills: list[tuple[Certification, CertificationSkill, Skill, EmployeeCertification]],
                                 dict_dto: dict[int, SkillProfileDTO]):
-        for certification, certification_skill, skill, employee_certification in certification_skills:
+        for certification, certification_skill, skill, employee_certification, domaine in certification_skills:
             end_ = employee_certification.end_
             start_ = employee_certification.start_
             is_active = end_ is None or end_ >= date.today()
@@ -72,12 +79,12 @@ class SkillService():
                         acquired_at=start_,
                         expires_at=end_
                     )
-            self.push_into_dict(source,skill, dict_dto)
+            self.push_into_dict(source,skill, dict_dto, domaine)
 
 
     def get_skillsourcedto_from_diploma_skill(self, diploma_skills: list[tuple[Diploma, DiplomaSkill, Skill, EmployeeDiploma]],
                                               dict_dto: dict[int, SkillProfileDTO]):
-        for diploma, diploma_skill,skill, employee_diploma in diploma_skills:
+        for diploma, diploma_skill,skill, employee_diploma,domaine in diploma_skills:
             source = SkillSourceDTO(
                 source_type=SKILLSOURCETYPE.DIPLOMA.value,
                 source_id= diploma.id_diploma,
@@ -87,11 +94,11 @@ class SkillService():
                 expires_at= None
             )
 
-            self.push_into_dict(source,skill, dict_dto)
+            self.push_into_dict(source,skill, dict_dto, domaine)
     
     def get_skillsourcedto_from_validated_skill(self, validated_skills: list[tuple[SkillValidation, Skill]], 
                              dict_dto: dict[int, SkillProfileDTO]):
-        for skill_validation, skill in validated_skills:
+        for skill_validation, skill, domaine in validated_skills:
             source = SkillSourceDTO(
                 source_type=SKILLSOURCETYPE.VALIDATION.value,
                 source_id=skill_validation.id_skill_validation,
@@ -101,15 +108,16 @@ class SkillService():
                 expires_at=None
             )
 
-            self.push_into_dict(source,skill, dict_dto)
+            self.push_into_dict(source,skill, dict_dto, domaine)
 
-    def push_into_dict(self, source: SkillSourceDTO, skill:Skill, dict_dto: dict[int, SkillProfileDTO]):
+    def push_into_dict(self, source: SkillSourceDTO, skill:Skill, dict_dto: dict[int, SkillProfileDTO], domaine):
         if skill.id_skill not in dict_dto:
             dict_dto[skill.id_skill] = SkillProfileDTO(
                 skill_id=skill.id_skill,
                 skill_name=skill.name_skill,
                 displayed_level=source.level,
                 primary_source=source,
+                skill_domaine=domaine,
                 sources=[source]
             )
         else:    

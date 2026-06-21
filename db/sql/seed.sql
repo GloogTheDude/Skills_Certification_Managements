@@ -48,27 +48,27 @@ INSERT INTO public.domaine (id_domaine, nom_domaine, is_deleted) VALUES
 (7, 'Project Management', false),
 (8, 'Soft Skills', false);
 
-INSERT INTO public.skill (id_skill, name_skill, is_deleted) VALUES
-(1, 'Python', false),
-(2, 'Java', false),
-(3, 'SQL', false),
-(4, 'PostgreSQL', false),
-(5, 'SQLAlchemy', false),
-(6, 'Alembic', false),
-(7, 'Git', false),
-(8, 'Docker', false),
-(9, 'Linux', false),
-(10, 'REST API', false),
-(11, 'HTML/CSS', false),
-(12, 'JavaScript', false),
-(13, 'Cybersecurity Basics', false),
-(14, 'Network Fundamentals', false),
-(15, 'Data Analysis', false),
-(16, 'Power BI', false),
-(17, 'Agile Scrum', false),
-(18, 'Communication', false),
-(19, 'Testing', false),
-(20, 'CI/CD', false);
+INSERT INTO public.skill (id_skill, name_skill, is_deleted, id_domaine) VALUES
+(1, 'Python', false,1),
+(2, 'Java', false,1),
+(3, 'SQL', false,3),
+(4, 'PostgreSQL', false,3),
+(5, 'SQLAlchemy', false,1),
+(6, 'Alembic', false,1),
+(7, 'Git', false,7),
+(8, 'Docker', false,7),
+(9, 'Linux', false,4),
+(10, 'REST API', false,4),
+(11, 'HTML/CSS', false,2),
+(12, 'JavaScript', false,2),
+(13, 'Cybersecurity Basics', false,5),
+(14, 'Network Fundamentals', false,4),
+(15, 'Data Analysis', false,1),
+(16, 'Power BI', false,1),
+(17, 'Agile Scrum', false,7),
+(18, 'Communication', false,8),
+(19, 'Testing', false,7),
+(20, 'CI/CD', false,7);
 
 INSERT INTO public.validation_type (id_validation, source, denomination_validation, is_deleted) VALUES
 (1, 'manual', 'Manager validation', false),

@@ -1,4 +1,4 @@
-from sqlalchemy import select, func, or_, in_
+from sqlalchemy import select, func, or_
 from sqlalchemy.orm import Session
 
 from models.certification import Certification
@@ -12,6 +12,7 @@ from models.skill import Skill
 from models.skill_validation import SkillValidation
 from models.training import Training
 from models.training_skill import TrainingSkill
+from models.domaine import Domaine
 
 from datetime import date
 
@@ -28,7 +29,8 @@ class AcquisitionSkillRepository():
     def __init__(self,session):
         self.session = session
 
-    def get_trainingskills_by_id_employee(self, id_employee: int) -> list[tuple[Training, TrainingSkill, Skill]]:
+    def get_trainingskills_by_id_employee(self, id_employee: int
+    ) -> list[tuple[Training, TrainingSkill, Skill, str | None]]:
         sub_query = (
             select(Training.id_training)
             .join(Participation, Participation.id_training == Training.id_training)
@@ -38,65 +40,78 @@ class AcquisitionSkillRepository():
                 Participation.is_deleted.is_(False),
                 Training.id_diploma.is_(None),
                 Training.id_certification.is_(None),
-                Training.is_deleted.is_(False)
+                Training.is_deleted.is_(False),
             )
         )
 
         stmt = (
-            select(Training, TrainingSkill, Skill)
+            select(Training, TrainingSkill, Skill, Domaine.nom_domaine)
             .join(TrainingSkill, TrainingSkill.id_training == Training.id_training)
             .join(Skill, Skill.id_skill == TrainingSkill.id_skill)
-            .where(Training.id_training.in_(sub_query))
+            .outerjoin(Domaine, Domaine.id_domaine == Skill.id_domaine)
+            .where(
+                Training.id_training.in_(sub_query),
+                TrainingSkill.is_deleted.is_(False),
+                Skill.is_deleted.is_(False),
+            )
         )
 
         return self.session.execute(stmt).all()
     
-    def get_diplomeskills_by_id_employee(self, id_employee: int) -> list[tuple[Diploma, DiplomaSkill, Skill, EmployeeDiploma]]:
+    def get_diplomeskills_by_id_employee(self, id_employee: int
+    ) -> list[tuple[Diploma, DiplomaSkill, Skill, EmployeeDiploma, str | None]]:
         stmt = (
-            select(Diploma, DiplomaSkill, Skill, EmployeeDiploma)
+            select(Diploma, DiplomaSkill, Skill, EmployeeDiploma, Domaine.nom_domaine)
             .join(EmployeeDiploma, EmployeeDiploma.id_diploma == Diploma.id_diploma)
             .join(DiplomaSkill, DiplomaSkill.id_diploma == Diploma.id_diploma)
             .join(Skill, Skill.id_skill == DiplomaSkill.id_skill)
+            .outerjoin(Domaine, Domaine.id_domaine == Skill.id_domaine)
             .where(
                 EmployeeDiploma.id_employee == id_employee,
                 EmployeeDiploma.is_deleted.is_(False),
                 Diploma.is_deleted.is_(False),
+                DiplomaSkill.is_deleted.is_(False),
                 Skill.is_deleted.is_(False),
             )
         )
         return self.session.execute(stmt).all()
 
-    def get_certificationskill_by_id_employee(self, id_employee: int) -> list[tuple[Certification, CertificationSkill, Skill, EmployeeCertification]]:
+    def get_certificationskill_by_id_employee(self, id_employee: int
+    ) -> list[tuple[Certification, CertificationSkill, Skill, EmployeeCertification, str | None]]:
         stmt = (
-            select(Certification, CertificationSkill, Skill, EmployeeCertification)
+            select(Certification, CertificationSkill, Skill, EmployeeCertification, Domaine.nom_domaine)
             .join(
                 EmployeeCertification,
-                EmployeeCertification.id_certification == Certification.id_certification
+                EmployeeCertification.id_certification == Certification.id_certification,
             )
             .join(
                 CertificationSkill,
-                CertificationSkill.id_certification == Certification.id_certification
+                CertificationSkill.id_certification == Certification.id_certification,
             )
             .join(Skill, Skill.id_skill == CertificationSkill.id_skill)
+            .outerjoin(Domaine, Domaine.id_domaine == Skill.id_domaine)
             .where(
                 EmployeeCertification.id_employee == id_employee,
                 EmployeeCertification.is_deleted.is_(False),
                 Certification.is_deleted.is_(False),
+                CertificationSkill.is_deleted.is_(False),
                 Skill.is_deleted.is_(False),
             )
         )
         return self.session.execute(stmt).all()
 
-    def get_validationskill_by_id_employee(self, id_employee: int) -> list[tuple[SkillValidation, Skill]]:
-            stmt = (
-                select(SkillValidation, Skill)
-                .join(Skill, Skill.id_skill == SkillValidation.id_skill)
-                .where(
-                    SkillValidation.id_employee == id_employee,
-                    SkillValidation.is_deleted.is_(False),
-                    Skill.is_deleted.is_(False),
-                )
+    def get_validationskill_by_id_employee(self, id_employee: int
+    ) -> list[tuple[SkillValidation, Skill, str | None]]:
+        stmt = (
+            select(SkillValidation, Skill, Domaine.nom_domaine)
+            .join(Skill, Skill.id_skill == SkillValidation.id_skill)
+            .outerjoin(Domaine, Domaine.id_domaine == Skill.id_domaine)
+            .where(
+                SkillValidation.id_employee == id_employee,
+                SkillValidation.is_deleted.is_(False),
+                Skill.is_deleted.is_(False),
             )
-            return self.session.execute(stmt).all()
+        )
+        return self.session.execute(stmt).all()
 
    

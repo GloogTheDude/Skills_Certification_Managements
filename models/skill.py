@@ -1,4 +1,4 @@
-from sqlalchemy import String,Boolean
+from sqlalchemy import String,Boolean,ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
@@ -14,8 +14,13 @@ class Skill(Base):
                                             server_default="false",
                                             nullable=False
                                         )
+    id_domaine: Mapped[int] = mapped_column(
+                            ForeignKey("domaine.id_domaine"),
+                            nullable=True
+                        )
 
     validations = relationship("SkillValidation", back_populates="skill")
     certification_links = relationship("CertificationSkill", back_populates="skill")
     diploma_links = relationship("DiplomaSkill", back_populates="skill")
     training_links = relationship("TrainingSkill", back_populates="skill")
+    domaine = relationship("Domaine", back_populates="skills")

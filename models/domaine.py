@@ -17,4 +17,5 @@ class Domaine(Base):
 
     diplomas = relationship("Diploma", back_populates="domaine")
     certifications = relationship("Certification", back_populates="domaine")
-    trainings = relationship("Training", back_populates="domaine") 
+    trainings = relationship("Training", back_populates="domaine")
+    skills = relationship("Skill",back_populates="domaine")
