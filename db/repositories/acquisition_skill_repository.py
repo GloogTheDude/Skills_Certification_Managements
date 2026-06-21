@@ -13,6 +13,8 @@ from models.skill_validation import SkillValidation
 from models.training import Training
 from models.training_skill import TrainingSkill
 
+from datetime import date
+
 """dans l'idée c'est:
     1) from an id_employee fetch training where participation = completed and id_diplome = null and id_certificaiton=Null
     2) from thoses fetch trainingXskill
@@ -49,9 +51,9 @@ class AcquisitionSkillRepository():
 
         return self.session.execute(stmt).all()
     
-    def get_diplomeskills_by_id_employee(self, id_employee: int) -> list[tuple[Diploma, DiplomaSkill, Skill]]:
+    def get_diplomeskills_by_id_employee(self, id_employee: int) -> list[tuple[Diploma, DiplomaSkill, Skill, EmployeeDiploma]]:
         stmt = (
-            select(Diploma, DiplomaSkill, Skill)
+            select(Diploma, DiplomaSkill, Skill, EmployeeDiploma)
             .join(EmployeeDiploma, EmployeeDiploma.id_diploma == Diploma.id_diploma)
             .join(DiplomaSkill, DiplomaSkill.id_diploma == Diploma.id_diploma)
             .join(Skill, Skill.id_skill == DiplomaSkill.id_skill)
@@ -64,9 +66,9 @@ class AcquisitionSkillRepository():
         )
         return self.session.execute(stmt).all()
 
-    def get_certificationskill_by_id_employee(self, id_employee: int) -> list[tuple[Certification, CertificationSkill, Skill]]:
+    def get_certificationskill_by_id_employee(self, id_employee: int) -> list[tuple[Certification, CertificationSkill, Skill, EmployeeCertification]]:
         stmt = (
-            select(Certification, CertificationSkill, Skill)
+            select(Certification, CertificationSkill, Skill, EmployeeCertification)
             .join(
                 EmployeeCertification,
                 EmployeeCertification.id_certification == Certification.id_certification
