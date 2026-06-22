@@ -2,7 +2,9 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
+from core.constants import CERTIFICATIONSTATUS
 from db.repositories.employee_certification_repository import EmployeeCertificationRepository
+from dto.employee_certification_dto import CloseToExpirationDTO
 from models.certification import Certification
 from models.employee_certification import EmployeeCertification
 
@@ -24,5 +26,27 @@ class EmployeeCertificationService():
             employee_certification.expiration =None
         else: 
             employee_certification.expiration = end_ + relativedelta(months=validity_month)
-        
         self.employee_certification_repository.add(employee_certification)
+
+    def get_close_to_expiration(self)->list[CloseToExpirationDTO]:
+        today = date.today()
+        close_to_expiration = self.employee_certification_repository.get_close_to_expiration()
+        arr_dto = []
+        for employee_certification, employee, certification in close_to_expiration:
+            dto = CloseToExpirationDTO(
+                employee_id = employee.id_employee,
+                employee_first_name = employee.first_name,
+                employee_last_name= employee.last_name,
+                certification_id = certification.id_certification,
+                certification_name = certification.subject_certification,
+                expiration_date = employee_certification.expiration,
+                status = None
+            )
+            if dto.expiration_date < today:
+                dto.status = CERTIFICATIONSTATUS.EXPIRED.value
+            elif dto.expiration_date <= today + relativedelta(months=1):
+                dto.status = CERTIFICATIONSTATUS.URGENT.value
+            else:
+                dto.status = CERTIFICATIONSTATUS.EXPIRING_SOON.value
+            arr_dto.append(dto)
+        return arr_dto

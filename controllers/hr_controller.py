@@ -1,13 +1,16 @@
 from controllers.participation_controler import ParticipationController
 from core.database import SessionLocal
 from db.repositories.acquisition_skill_repository import AcquisitionSkillRepository
+from db.repositories.employee_certification_repository import EmployeeCertificationRepository
 from menus.employee_menu import EmployeeMenu
 from db.repositories.skills_repository import SkillRepository
+from services.employee_certification_service import EmployeeCertificationService
 from services.skill_service import SkillService
 from db.repositories.certification_repository import CertificationRepository
 from services.certification_service import CertificationService
 from dto.employee_dto import EmployeeDTO
 from menus.hr_menu import HRMenu 
+from menus.employee_certification_menu import EmployeeCertificationMenu as ecm
 from controllers.training_request_controller import TrainingRequestController
 
 
@@ -50,7 +53,11 @@ class HRController():
                     participation_controller.main_menu()
                 case 7:
                     #check certification dead or near end of life
-                    pass
+                    with SessionLocal() as session:
+                        repo = EmployeeCertificationRepository(session)
+                        service = EmployeeCertificationService(repo)
+                        close_expiration = service.get_close_to_expiration()
+                    ecm.display_close_to_expiration(close_expiration)
                 case 8:
                     #crud menu
                     pass
