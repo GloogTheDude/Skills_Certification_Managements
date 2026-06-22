@@ -20,3 +20,9 @@ class SkillProfileDTO:
     displayed_level: int
     primary_source: SkillSourceDTO | None
     sources: list[SkillSourceDTO]
+
+@dataclass
+class SkillCrudDTO:
+    id_skill: int
+    name_skill: str
+    domaine_name: str | None

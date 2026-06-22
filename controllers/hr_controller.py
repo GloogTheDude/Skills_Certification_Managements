@@ -13,7 +13,7 @@ from menus.hr_menu import HRMenu
 from menus.employee_certification_menu import EmployeeCertificationMenu as ecm
 from controllers.training_request_controller import TrainingRequestController
 from controllers.training_source_controller import TrainingSourceController
-
+from controllers.skill_controller import SkillController
 
 class HRController():
     def __init__(self,hr: EmployeeDTO):
@@ -62,6 +62,8 @@ class HRController():
                     #crud menu
                     controller = TrainingSourceController()
                     controller.main_menu()
+                    controller2 = SkillController()
+                    controller2.main_menu()
                 case 0:
                     return 
                 

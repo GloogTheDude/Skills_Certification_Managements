@@ -8,7 +8,7 @@ from models.employee_certification import EmployeeCertification
 from models.employee_diploma import EmployeeDiploma
 from models.skill import Skill
 from dto.employee_skill_dto import EmployeeSkillDTO 
-from dto.skill_dto import SkillProfileDTO,SkillSourceDTO
+from dto.skill_dto import SkillCrudDTO, SkillProfileDTO,SkillSourceDTO
 from models.skill_validation import SkillValidation
 from models.training import Training
 from models.training_skill import TrainingSkill
@@ -19,17 +19,7 @@ class SkillService():
     def __init__(self, skill_repo:SkillRepository, aquisition_skill_repository:AcquisitionSkillRepository = None):
         self.acquisition_skill_repository = aquisition_skill_repository
         self.skill_repository = skill_repo
-
-    def get_skill_employee(self, id_employee):
-        result = self.skill_repository.get_employee_skills(id_employee)
-        return [
-            EmployeeSkillDTO(
-                skill_name=skill.name_skill,
-                level=level
-            )
-            for skill, level in result]
     
-
     def get_acquired_skills(self, id_employee)->list[SkillProfileDTO]:
         training_skills = self.acquisition_skill_repository.get_trainingskills_by_id_employee(id_employee)
         certification_skills = self.acquisition_skill_repository.get_certificationskill_by_id_employee(id_employee)
@@ -134,3 +124,53 @@ class SkillService():
             return False
 
         return new_source.level > current_source.level
+    
+    def get_all(self) -> list[Skill]:
+        return self.skill_repository.get_all()
+
+    def get_by_id(self, id_skill: int) -> Skill | None:
+        return self.skill_repository.get_by_id(id_skill)
+
+    def create(self, name_skill: str, id_domaine: int | None) -> Skill:
+        skill = Skill()
+        skill.name_skill = name_skill
+        skill.id_domaine = id_domaine
+        skill.is_deleted = False
+
+        return self.skill_repository.add(skill)
+
+    def update(
+        self,
+        id_skill: int,
+        name_skill: str,
+        id_domaine: int | None,
+    ) -> Skill | None:
+        skill = self.skill_repository.get_by_id(id_skill)
+
+        if skill is None or skill.is_deleted:
+            return None
+
+        skill.name_skill = name_skill
+        skill.id_domaine = id_domaine
+        return skill
+
+    def delete(self, id_skill: int) -> bool:
+        skill = self.skill_repository.get_by_id(id_skill)
+
+        if skill is None or skill.is_deleted:
+            return False
+
+        self.skill_repository.soft_delete(skill)
+        return True
+
+    def get_all_for_crud(self) -> list[SkillCrudDTO]:
+        rows = self.skill_repository.get_all_for_crud()
+
+        return [
+            SkillCrudDTO(
+                id_skill=id_skill,
+                name_skill=name_skill,
+                domaine_name=domaine_name,
+            )
+            for id_skill, name_skill, domaine_name in rows
+        ]
