@@ -30,5 +30,7 @@ class ParticipationMenu():
             print("3. Create a participation to a training for an employee")
             print("0. Leave")
             user_choice = int(input("your choice: "))
+        if user_choice ==0:
+            return None
         return user_choice
         
