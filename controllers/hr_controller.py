@@ -1,4 +1,4 @@
-from controllers.participation_controler import ParticipationController
+from controllers.participation_controller import ParticipationController
 from core.database import SessionLocal
 from db.repositories.acquisition_skill_repository import AcquisitionSkillRepository
 from db.repositories.employee_certification_repository import EmployeeCertificationRepository
@@ -14,6 +14,7 @@ from menus.employee_certification_menu import EmployeeCertificationMenu as ecm
 from controllers.training_request_controller import TrainingRequestController
 from controllers.training_source_controller import TrainingSourceController
 from controllers.skill_controller import SkillController
+from controllers.domaine_controller import DomaineController
 
 class HRController():
     def __init__(self,hr: EmployeeDTO):
@@ -64,6 +65,8 @@ class HRController():
                     controller.main_menu()
                     controller2 = SkillController()
                     controller2.main_menu()
+                    controller3= DomaineController()
+                    controller3.main_menu()
                 case 0:
                     return 
                 
