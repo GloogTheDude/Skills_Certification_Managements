@@ -34,7 +34,8 @@ class ParticipationService():
                 training_title = training.title,
                 training_start = training.start_,
                 training_end = training.end_,
-                participation_status = participation.status
+                participation_status = participation.status,
+                training_type=None
             )
             if training.id_diploma:
                 participation_dto.training_type = TYPEPARTICIPATIONDTO.DIPLOMA.value
@@ -48,8 +49,8 @@ class ParticipationService():
 
         return participations_completable
     
-    def set_participation_to_completed(self, id_participation):
-        self.participation_repository.change_status(id_participation, PARTICIPATIONSTATUS.COMPLETED.value)
+    def set_participation_to_completed(self, id_employee, id_training):
+        self.participation_repository.change_status(id_employee, id_training, PARTICIPATIONSTATUS.COMPLETED.value)
         
 
     

@@ -37,13 +37,18 @@ class ParticipationRepository():
         if min_end_date is not None:
             conditions.append(Training.end_ <= min_end_date)
         stmt = (
-            select(...)
+            select(Participation,Employee,Training)
+            .join(Employee, Employee.id_employee == Participation.id_employee)
+            .join(Training, Training.id_training == Participation.id_training)
             .where(*conditions)
         )
         return self.session.execute(stmt).all()
     
     def change_status(self, id_employee:int, id_training:int, status:str):
-        participation = self.session.get(Participation, id_employee, id_training)
-        participation.status = status
+        participation = self.session.get(Participation, (id_employee, id_training))
+        if participation :
+            participation.status = status
+        else:
+            raise ValueError("Participation is None")
         
     

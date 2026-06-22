@@ -8,4 +8,4 @@ class EmployeeDiplomaRepository():
         self.session = session
 
     def add(self, employee_diploma: EmployeeDiploma):
-        self.session.add(EmployeeDiploma,employee_diploma)
+        self.session.add(employee_diploma)

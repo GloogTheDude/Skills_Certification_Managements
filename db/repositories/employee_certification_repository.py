@@ -5,7 +5,7 @@ from models.employee_certification import EmployeeCertification
 
 class EmployeeCertificationRepository():
     def __init__(self, session:Session):
-        self.session = Session
+        self.session = session
 
     def add(self, employee_certification:EmployeeCertification):
-        self.session.add(EmployeeCertification,employee_certification)
+        self.session.add(employee_certification)

@@ -1,3 +1,4 @@
+from controllers.participation_controler import ParticipationController
 from core.database import SessionLocal
 from db.repositories.acquisition_skill_repository import AcquisitionSkillRepository
 from menus.employee_menu import EmployeeMenu
@@ -44,9 +45,13 @@ class HRController():
                     #subordonate request to (in)validate
                     self.training_request_controller.manage_pending_requests_for_hr(self.hr)
                 case 6:
+                    #end of participation
+                    participation_controller = ParticipationController()
+                    participation_controller.main_menu()
+                case 7:
                     #check certification dead or near end of life
                     pass
-                case 7:
+                case 8:
                     #crud menu
                     pass
                 case 0:

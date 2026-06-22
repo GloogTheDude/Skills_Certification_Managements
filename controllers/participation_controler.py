@@ -31,9 +31,9 @@ class ParticipationController():
             repo_participation = ParticipationRepository(session)
             service = ParticipationService(repo_participation)
             participations_completable = service.get_participations_completable()
-        
+        print("Please choose the training to update: ")
         participation_selected:ParticipationDTO = pm.get_participation_dto(participations_completable)
-
+        print(f"Participation_selected = {participation_selected} ")
         if participation_selected.training_type == TYPEPARTICIPATIONDTO.DIPLOMA.value:
             self.complete_participation_diploma_training(participation_selected)
         elif participation_selected.training_type == TYPEPARTICIPATIONDTO.CERTIFICATION.value:
@@ -42,7 +42,9 @@ class ParticipationController():
         with SessionLocal() as session:
             repo_participation = ParticipationRepository(session)
             service = ParticipationService(repo_participation)
+            print(f"try to set as completed with: participation_selected.employee_id : {participation_selected.employee_id}, participation_selected.training_id{participation_selected.training_id})")
             service.set_participation_to_completed(participation_selected.employee_id, participation_selected.training_id)
+            session.commit()
 
 
     def complete_participation_diploma_training(self, participation_selected:ParticipationDTO):
@@ -61,6 +63,8 @@ class ParticipationController():
             repo_employee_diploma = EmployeeDiplomaRepository(session)
             employee_diploma_service = EmployeeDiplomaService(repo_employee_diploma)
             employee_diploma_service.add(employee.id_employee, diploma_id, training.start_, training.end_, distinction, training_source.name_source)
+            session.commit()
+
 
     def complete_participation_certification_training(self, participation_selected:ParticipationDTO):
         with SessionLocal() as session:
@@ -75,7 +79,25 @@ class ParticipationController():
             
             repo_employee_certification = EmployeeCertificationRepository(session)
             employee_certification_service = EmployeeCertificationService(repo_employee_certification)
-            employee_certification_service.add(employee.id_employee, certification.id_certification, training.start_, training.end, training_source.name_source, certification.validity_month)
-    
+            employee_certification_service.add(employee.id_employee, certification.id_certification, training.start_, training.end_, training_source.name_source, certification.validity_month)
+            session.commit()
 
+    def change_status_participation(self):
+        pass
+
+
+    def main_menu(self):
+        user_choice = pm.main_menu()
+        match user_choice:
+            case 0:
+                return
+            case 1:
+                #complete_participation
+                self.complete_participation()
+            case 2:
+                #change status
+                print("Feature still in developpment")
+            case 3:
+                #create participation
+                print("Feature still in developpment")
 
