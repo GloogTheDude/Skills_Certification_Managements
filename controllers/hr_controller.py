@@ -1,5 +1,6 @@
 from controllers.certification_controller import CertificationController
 from controllers.participation_controller import ParticipationController
+from controllers.training_controller import TrainingController
 from core.database import SessionLocal
 from db.repositories.acquisition_skill_repository import AcquisitionSkillRepository
 from db.repositories.employee_certification_repository import EmployeeCertificationRepository
@@ -73,6 +74,8 @@ class HRController():
                     controller4.main_menu()
                     controller5 = CertificationController()
                     controller5.main_menu()
+                    controller6 = TrainingController()
+                    controller6.main_menu()
                 case 0:
                     return 
                 
