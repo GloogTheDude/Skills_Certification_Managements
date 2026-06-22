@@ -12,6 +12,7 @@ from dto.employee_dto import EmployeeDTO
 from menus.hr_menu import HRMenu 
 from menus.employee_certification_menu import EmployeeCertificationMenu as ecm
 from controllers.training_request_controller import TrainingRequestController
+from controllers.training_source_controller import TrainingSourceController
 
 
 class HRController():
@@ -59,7 +60,8 @@ class HRController():
                     ecm.display_close_to_expiration(close_expiration)
                 case 8:
                     #crud menu
-                    pass
+                    controller = TrainingSourceController()
+                    controller.main_menu()
                 case 0:
                     return 
                 
