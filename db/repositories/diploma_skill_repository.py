@@ -1,23 +1,17 @@
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from models.diploma_skill import DiplomaSkill
 
 
 class DiplomaSkillRepository:
-    def __init__(self, session):
+    def __init__(self, session: Session):
         self.session = session
 
-    def add(self, diploma_skill):
-        self.session.add(diploma_skill)
-
-    def get_by_diploma_id(self, id_diploma):
-        stmt = select(DiplomaSkill).where(
-            DiplomaSkill.id_diploma == id_diploma,
-            DiplomaSkill.is_deleted.is_(False)
-        )
+    def get_all_by_diploma_id(self, id_diploma: int) -> list[DiplomaSkill]:
+        stmt = select(DiplomaSkill).where(DiplomaSkill.id_diploma == id_diploma)
         return self.session.scalars(stmt).all()
 
-    def soft_delete_by_diploma_id(self, id_diploma):
-        links = self.get_by_diploma_id(id_diploma)
-        for link in links:
-            link.is_deleted = True
+    def add(self, diploma_skill: DiplomaSkill) -> DiplomaSkill:
+        self.session.add(diploma_skill)
+        return diploma_skill

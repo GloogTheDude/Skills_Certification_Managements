@@ -1,18 +1,31 @@
 from db.repositories.certification_repository import CertificationRepository
 from db.repositories.domaine_repository import DomaineRepository
+from db.repositories.certification_skill_repository import CertificationSkillRepository
 from dto.certification_dto import CertificationCrudDTO
 from dto.employee_skill_dto import EmployeeSkillDTO
 from dto.employee_certification_dto import EmployeeCertificationDTO
 from models.certification import Certification
+from models.certification_skill import CertificationSkill
 
-class CertificationService():
-    def __init__(self,certification_repository: CertificationRepository,
-        domaine_repository: DomaineRepository | None = None,):
+
+class CertificationService:
+    def __init__(
+        self,
+        certification_repository: CertificationRepository,
+        domaine_repository: DomaineRepository | None = None,
+        certification_skill_repository: CertificationSkillRepository | None = None,
+    ):
         self.certification_repository = certification_repository
         self.domaine_repository = domaine_repository
+        self.certification_skill_repository = certification_skill_repository
 
-    def fetch_certification_employee(self, id_employee: int) -> list[EmployeeCertificationDTO]:
-        rows = self.certification_repository.get_certification_skill_by_id_employee(id_employee)
+    def fetch_certification_employee(
+        self,
+        id_employee: int,
+    ) -> list[EmployeeCertificationDTO]:
+        rows = self.certification_repository.get_certification_skill_by_id_employee(
+            id_employee
+        )
 
         certifications: dict[int, EmployeeCertificationDTO] = {}
 
@@ -115,4 +128,53 @@ class CertificationService():
             return False
 
         self.certification_repository.soft_delete(certification)
+        return True
+
+    def replace_skills(
+        self,
+        id_certification: int,
+        skill_levels: list[tuple[int, int]],
+    ) -> bool:
+        if self.certification_skill_repository is None:
+            raise ValueError(
+                "CertificationSkillRepository is required to replace skills."
+            )
+
+        certification = self.certification_repository.get_by_id(id_certification)
+
+        if certification is None or certification.is_deleted:
+            return False
+
+        existing_links = (
+            self.certification_skill_repository.get_all_by_certification_id(
+                id_certification
+            )
+        )
+        existing_by_skill_id = {
+            link.id_skill: link
+            for link in existing_links
+        }
+
+        selected_skill_ids = set()
+
+        for id_skill, granted_level in skill_levels:
+            selected_skill_ids.add(id_skill)
+
+            if id_skill in existing_by_skill_id:
+                link = existing_by_skill_id[id_skill]
+                link.granted_level = granted_level
+                link.is_deleted = False
+            else:
+                link = CertificationSkill()
+                link.id_certification = id_certification
+                link.id_skill = id_skill
+                link.granted_level = granted_level
+                link.is_deleted = False
+
+                self.certification_skill_repository.add(link)
+
+        for link in existing_links:
+            if link.id_skill not in selected_skill_ids:
+                link.is_deleted = True
+
         return True

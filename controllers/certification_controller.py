@@ -1,7 +1,9 @@
 from core.database import SessionLocal
 from db.repositories.certification_repository import CertificationRepository
 from db.repositories.domaine_repository import DomaineRepository
+from db.repositories.certification_skill_repository import CertificationSkillRepository
 from menus.certification_menu import CertificationMenu
+from menus.skill_link_menu import SkillLinkMenu
 from services.certification_service import CertificationService
 
 
@@ -37,6 +39,7 @@ class CertificationController:
         subject_certification = CertificationMenu.ask_subject_certification()
         validity_month = CertificationMenu.ask_validity_month()
         id_domaine = CertificationMenu.ask_id_domaine()
+        skill_levels = SkillLinkMenu.ask_skill_levels()
 
         if not subject_certification:
             CertificationMenu.display_error("Subject cannot be empty.")
@@ -46,7 +49,13 @@ class CertificationController:
             try:
                 certification_repo = CertificationRepository(session)
                 domaine_repo = DomaineRepository(session)
-                service = CertificationService(certification_repo, domaine_repo)
+                certification_skill_repo = CertificationSkillRepository(session)
+
+                service = CertificationService(
+                    certification_repo,
+                    domaine_repo,
+                    certification_skill_repo,
+                )
 
                 created = service.create(
                     subject_certification,
@@ -59,6 +68,13 @@ class CertificationController:
                     CertificationMenu.display_error("Invalid domaine.")
                     return
 
+                session.flush()
+
+                service.replace_skills(
+                    created.id_certification,
+                    skill_levels,
+                )
+
                 session.commit()
                 CertificationMenu.display_success("Certification created.")
             except Exception:
@@ -70,6 +86,7 @@ class CertificationController:
         subject_certification = CertificationMenu.ask_subject_certification()
         validity_month = CertificationMenu.ask_validity_month()
         id_domaine = CertificationMenu.ask_id_domaine()
+        skill_levels = SkillLinkMenu.ask_skill_levels()
 
         if not subject_certification:
             CertificationMenu.display_error("Subject cannot be empty.")
@@ -79,7 +96,13 @@ class CertificationController:
             try:
                 certification_repo = CertificationRepository(session)
                 domaine_repo = DomaineRepository(session)
-                service = CertificationService(certification_repo, domaine_repo)
+                certification_skill_repo = CertificationSkillRepository(session)
+
+                service = CertificationService(
+                    certification_repo,
+                    domaine_repo,
+                    certification_skill_repo,
+                )
 
                 updated = service.update(
                     id_certification,
@@ -94,6 +117,11 @@ class CertificationController:
                         "Certification not found or invalid domaine."
                     )
                     return
+
+                service.replace_skills(
+                    id_certification,
+                    skill_levels,
+                )
 
                 session.commit()
                 CertificationMenu.display_success("Certification updated.")

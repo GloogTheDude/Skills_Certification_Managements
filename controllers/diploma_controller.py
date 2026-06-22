@@ -1,7 +1,9 @@
 from core.database import SessionLocal
 from db.repositories.diploma_repository import DiplomaRepository
 from db.repositories.domaine_repository import DomaineRepository
+from db.repositories.diploma_skill_repository import DiplomaSkillRepository
 from menus.diploma_menu import DiplomaMenu
+from menus.skill_link_menu import SkillLinkMenu
 from services.diploma_service import DiplomaService
 
 
@@ -37,6 +39,7 @@ class DiplomaController:
         subject_diploma = DiplomaMenu.ask_subject_diploma()
         level_diploma = DiplomaMenu.ask_level_diploma()
         id_domaine = DiplomaMenu.ask_id_domaine()
+        skill_levels = SkillLinkMenu.ask_skill_levels()
 
         if not subject_diploma or not level_diploma:
             DiplomaMenu.display_error("Subject and level cannot be empty.")
@@ -46,7 +49,13 @@ class DiplomaController:
             try:
                 diploma_repo = DiplomaRepository(session)
                 domaine_repo = DomaineRepository(session)
-                service = DiplomaService(diploma_repo, domaine_repo)
+                diploma_skill_repo = DiplomaSkillRepository(session)
+
+                service = DiplomaService(
+                    diploma_repo,
+                    domaine_repo,
+                    diploma_skill_repo,
+                )
 
                 created = service.create(
                     subject_diploma,
@@ -59,6 +68,13 @@ class DiplomaController:
                     DiplomaMenu.display_error("Invalid domaine.")
                     return
 
+                session.flush()
+
+                service.replace_skills(
+                    created.id_diploma,
+                    skill_levels,
+                )
+
                 session.commit()
                 DiplomaMenu.display_success("Diploma created.")
             except Exception:
@@ -70,6 +86,7 @@ class DiplomaController:
         subject_diploma = DiplomaMenu.ask_subject_diploma()
         level_diploma = DiplomaMenu.ask_level_diploma()
         id_domaine = DiplomaMenu.ask_id_domaine()
+        skill_levels = SkillLinkMenu.ask_skill_levels()
 
         if not subject_diploma or not level_diploma:
             DiplomaMenu.display_error("Subject and level cannot be empty.")
@@ -79,7 +96,13 @@ class DiplomaController:
             try:
                 diploma_repo = DiplomaRepository(session)
                 domaine_repo = DomaineRepository(session)
-                service = DiplomaService(diploma_repo, domaine_repo)
+                diploma_skill_repo = DiplomaSkillRepository(session)
+
+                service = DiplomaService(
+                    diploma_repo,
+                    domaine_repo,
+                    diploma_skill_repo,
+                )
 
                 updated = service.update(
                     id_diploma,
@@ -90,8 +113,15 @@ class DiplomaController:
 
                 if updated is None:
                     session.rollback()
-                    DiplomaMenu.display_error("Diploma not found or invalid domaine.")
+                    DiplomaMenu.display_error(
+                        "Diploma not found or invalid domaine."
+                    )
                     return
+
+                service.replace_skills(
+                    id_diploma,
+                    skill_levels,
+                )
 
                 session.commit()
                 DiplomaMenu.display_success("Diploma updated.")

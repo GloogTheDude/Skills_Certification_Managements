@@ -1,4 +1,4 @@
-class MenuSkillLink():
+class SkillLinkMenu():
 
     @staticmethod
     def ask_skill_levels() -> list[tuple[int, int]]:
