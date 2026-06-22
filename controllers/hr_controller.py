@@ -48,7 +48,6 @@ class HRController():
                     #subordonate request to (in)validate
                     self.training_request_controller.manage_pending_requests_for_hr(self.hr)
                 case 6:
-                    #end of participation
                     participation_controller = ParticipationController()
                     participation_controller.main_menu()
                 case 7:

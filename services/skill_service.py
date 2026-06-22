@@ -31,15 +31,10 @@ class SkillService():
     
 
     def get_acquired_skills(self, id_employee)->list[SkillProfileDTO]:
-        print(f"id_employee = {id_employee}")
         training_skills = self.acquisition_skill_repository.get_trainingskills_by_id_employee(id_employee)
         certification_skills = self.acquisition_skill_repository.get_certificationskill_by_id_employee(id_employee)
         diploma_skills = self.acquisition_skill_repository.get_diplomeskills_by_id_employee(id_employee)
         validated_skills = self.acquisition_skill_repository.get_validationskill_by_id_employee(id_employee)
-        print(f"len(training_skills)={len(training_skills)}")
-        print(f"len(certification_skills)={len(certification_skills)}")
-        print(f"len(diploma_skills)={len(diploma_skills)}")
-        print(f"len(validated_skills)={len(validated_skills)}")
         dict_dto={}
         self.get_skillsourcedto_from_training_skill(training_skills, dict_dto)
         self.get_skillsourcedto_from_certification_skill(certification_skills, dict_dto)
