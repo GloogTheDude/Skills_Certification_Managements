@@ -18,6 +18,7 @@ from controllers.training_source_controller import TrainingSourceController
 from controllers.skill_controller import SkillController
 from controllers.domaine_controller import DomaineController
 from controllers.diploma_controller import DiplomaController
+from controllers.employee_crud_controller import EmployeeCrudController
 
 class HRController():
     def __init__(self,hr: EmployeeDTO):
@@ -76,6 +77,8 @@ class HRController():
                     controller5.main_menu()
                     controller6 = TrainingController()
                     controller6.main_menu()
+                    controller7 = EmployeeCrudController()
+                    controller7.main_menu()
                 case 0:
                     return 
                 
