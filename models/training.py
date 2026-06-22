@@ -1,6 +1,7 @@
 from datetime import date
+from decimal import Decimal
 
-from sqlalchemy import Boolean, CheckConstraint, Date, ForeignKey, String
+from sqlalchemy import Boolean, CheckConstraint, Date, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -25,6 +26,11 @@ class Training(Base):
         nullable=True,
     )
 
+    id_source: Mapped[int | None] = mapped_column(
+        ForeignKey("training_source.id_source"),
+        nullable=True,
+    )
+
     id_certification: Mapped[int | None] = mapped_column(
         ForeignKey("certification.id_certification"),
         nullable=True,
@@ -38,6 +44,9 @@ class Training(Base):
     start_: Mapped[date | None] = mapped_column(Date)
     end_: Mapped[date | None] = mapped_column(Date)
 
+    cost_hour: Mapped[Decimal | None] = mapped_column(Numeric(15, 2))
+    duration_hours: Mapped[Decimal | None] = mapped_column(Numeric(15, 2))
+
     is_deleted: Mapped[bool] = mapped_column(
         Boolean,
         default=False,
@@ -46,6 +55,7 @@ class Training(Base):
     )
 
     domaine = relationship("Domaine", back_populates="trainings")
+    source = relationship("TrainingSource", back_populates="trainings")
 
     certification = relationship("Certification", back_populates="trainings")
     diploma = relationship("Diploma", back_populates="trainings")
@@ -53,4 +63,3 @@ class Training(Base):
     requests = relationship("TrainingRequest", back_populates="training")
     participations = relationship("Participation", back_populates="training")
     skill_links = relationship("TrainingSkill", back_populates="training")
-    providers = relationship("Provide", back_populates="training")

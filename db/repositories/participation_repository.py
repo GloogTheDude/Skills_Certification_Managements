@@ -42,5 +42,8 @@ class ParticipationRepository():
         )
         return self.session.execute(stmt).all()
     
-    
+    def change_status(self, id_employee:int, id_training:int, status:str):
+        participation = self.session.get(Participation, id_employee, id_training)
+        participation.status = status
+        
     

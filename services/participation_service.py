@@ -1,6 +1,6 @@
 from db.repositories.participation_repository import ParticipationRepository
 
-from core.constants import PARTICIPATIONSTATUS
+from core.constants import PARTICIPATIONSTATUS,TYPEPARTICIPATIONDTO
 
 from datetime import datetime
 
@@ -36,10 +36,22 @@ class ParticipationService():
                 training_end = training.end_,
                 participation_status = participation.status
             )
+            if training.id_diploma:
+                participation_dto.training_type = TYPEPARTICIPATIONDTO.DIPLOMA.value
+            elif training.id_certification:
+                participation_dto.training_type  = TYPEPARTICIPATIONDTO.CERTIFICATION.value
+            else:
+                participation_dto.training_type  = TYPEPARTICIPATIONDTO.SKILL.value
+
             participations_completable[i] = participation_dto
             i+=1
 
         return participations_completable
+    
+    def set_participation_to_completed(self, id_participation):
+        self.participation_repository.change_status(id_participation, PARTICIPATIONSTATUS.COMPLETED.value)
+        
+
     
    
 

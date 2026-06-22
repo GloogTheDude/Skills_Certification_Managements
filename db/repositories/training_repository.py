@@ -9,6 +9,7 @@ from models.skill import Skill
 
 from datetime import date
 from dto.training_skill_dto import TrainingSkillDTO
+from models.training_source import TrainingSource
 
 
 class TrainingRepository():
@@ -58,3 +59,9 @@ class TrainingRepository():
                    .where(Training.id_training == id_training)
         )
         return self.session.execute(stmt).all()
+
+
+    
+    def fetch_source(self, id_training)->TrainingSource:
+        training = self.get_by_id(id_training)
+        return training.source

@@ -16,7 +16,6 @@ from .certification_skill import CertificationSkill
 from .diploma_skill import DiplomaSkill
 from .participation import Participation
 from .training_skill import TrainingSkill
-from .provide import Provide
 from .access_level import AccessLevel
 
 __all__ = [
@@ -39,5 +38,4 @@ __all__ = [
     "DiplomaSkill",
     "Participation",
     "TrainingSkill",
-    "Provide",
 ]

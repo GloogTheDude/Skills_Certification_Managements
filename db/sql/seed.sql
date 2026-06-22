@@ -1,11 +1,12 @@
 BEGIN;
 
+-- Updated seed: public.provide removed. Provider/cost/duration now live directly on public.training.
+
 -- Clean reset for repeatable seed
 TRUNCATE TABLE
     public.skill_validation,
     public.training_request,
     public.participation,
-    public.provide,
     public.trainingxskill,
     public.certificationxskill,
     public.diplomaxskill,
@@ -136,25 +137,31 @@ INSERT INTO public.training (
     end_,
     is_deleted,
     id_certification,
-    id_diploma
+    id_diploma,
+    id_source,
+    cost_hour,
+    duration_hours
 ) VALUES
-(1, 'Python Backend Bootcamp', 1, '2026-01-08', '2026-01-19', false, 1, NULL),
-(2, 'Advanced SQL PostgreSQL', 3, '2026-02-05', '2026-02-09', false, 3, NULL),
-(3, 'SQLAlchemy and Alembic', 1, '2026-02-19', '2026-02-23', false, NULL, 1),
-(4, 'Docker for Developers', 4, '2026-03-04', '2026-03-06', false, 4, NULL),
-(5, 'Linux Administration Basics', 4, '2026-03-11', '2026-03-15', false, 5, NULL),
-(6, 'Security Awareness Workshop', 5, '2026-03-25', '2026-03-25', false, 6, NULL),
-(7, 'Power BI Reporting', 6, '2026-04-08', '2026-04-12', false, 7, NULL),
-(8, 'Agile Scrum Practice', 7, '2026-04-22', '2026-04-24', false, 8, NULL),
-(9, 'REST API Design', 1, '2026-05-06', '2026-05-10', false, 9, NULL),
-(10, 'Git Workflow Team Training', 4, '2026-05-20', '2026-05-21', false, 10, NULL),
-(11, 'Java Refresher', 1, '2026-06-03', '2026-06-07', false, 2, NULL),
-(12, 'Internal Communication', 8, '2026-06-17', '2026-06-17', false, NULL, NULL),
-(13, 'Bachelor IT Bridge Program', 1, '2026-07-06', '2026-07-31', false, NULL, 1),
-(14, 'Network Diploma Preparation', 4, '2026-08-03', '2026-08-21', false, NULL, 3),
-(15, 'Cybersecurity Master Preparation', 5, '2026-09-01', '2026-09-25', false, NULL, 4),
-(16, 'Data Science Diploma Track', 6, '2026-10-05', '2026-10-30', false, NULL, 5),
-(17, 'IT Project Management Degree Track', 7, '2026-11-02', '2026-11-20', false, NULL, 6);
+(1, 'Python Backend Bootcamp', 1, '2026-01-08', '2026-01-19', false, 1, NULL, 1, 85.00, 70.00),
+(2, 'Advanced SQL PostgreSQL', 3, '2026-02-05', '2026-02-09', false, 3, NULL, 1, 90.00, 35.00),
+(3, 'SQLAlchemy and Alembic', 1, '2026-02-19', '2026-02-23', false, NULL, 1, 3, 55.00, 35.00),
+(4, 'Docker for Developers', 4, '2026-03-04', '2026-03-06', false, 4, NULL, 4, 50.00, 21.00),
+(5, 'Linux Administration Basics', 4, '2026-03-11', '2026-03-15', false, 5, NULL, 2, 70.00, 35.00),
+(6, 'Security Awareness Workshop', 5, '2026-03-25', '2026-03-25', false, 6, NULL, 7, 0.00, 7.00),
+(7, 'Power BI Reporting', 6, '2026-04-08', '2026-04-12', false, 7, NULL, 3, 60.00, 35.00),
+(8, 'Agile Scrum Practice', 7, '2026-04-22', '2026-04-24', false, 8, NULL, 6, 95.00, 21.00),
+(9, 'REST API Design', 1, '2026-05-06', '2026-05-10', false, 9, NULL, 1, 88.00, 35.00),
+(10, 'Git Workflow Team Training', 4, '2026-05-20', '2026-05-21', false, 10, NULL, 7, 0.00, 14.00),
+(11, 'Java Refresher', 1, '2026-06-03', '2026-06-07', false, 2, NULL, 4, 48.00, 35.00),
+(12, 'Internal Communication', 8, '2026-06-17', '2026-06-17', false, NULL, NULL, 7, 0.00, 7.00),
+(13, 'Bachelor IT Bridge Program', 1, '2026-07-06', '2026-07-31', false, NULL, 1, 5, 75.00, 120.00),
+(14, 'Network Diploma Preparation', 4, '2026-08-03', '2026-08-21', false, NULL, 3, 2, 80.00, 105.00),
+(15, 'Cybersecurity Master Preparation', 5, '2026-09-01', '2026-09-25', false, NULL, 4, 5, 120.00, 140.00),
+(16, 'Data Science Diploma Track', 6, '2026-10-05', '2026-10-30', false, NULL, 5, 3, 90.00, 120.00),
+(17, 'IT Project Management Degree Track', 7, '2026-11-02', '2026-11-20', false, NULL, 6, 6, 95.00, 90.00),
+(18, 'SQLAlchemy Practice Workshop', 1, '2026-02-26', '2026-02-27', false, NULL, NULL, 7, 0.00, 14.00),
+(19, 'Git and CI/CD Workshop', 7, '2026-05-25', '2026-05-26', false, NULL, NULL, 7, 0.00, 14.00),
+(20, 'Testing Fundamentals Workshop', 7, '2026-06-10', '2026-06-11', false, NULL, NULL, 7, 0.00, 14.00);
 
 -- Diploma requirements
 INSERT INTO public.diplomaxskill (id_diploma, id_skill, min_level, is_deleted) VALUES
@@ -179,46 +186,19 @@ INSERT INTO public.certificationxskill (id_certification, id_skill, granted_leve
 (10, 7, 4, false), (10, 20, 2, false);
 
 -- Training granted skills
+-- Rule:
+-- - If a training targets a certification, skills come from certificationxskill.
+-- - If a training targets a diploma, skills come from diplomaxskill.
+-- - Only skills-only trainings should appear here.
 INSERT INTO public.trainingxskill (id_skill, id_training, granted_level, is_deleted) VALUES
-(1, 1, 3, false), (10, 1, 2, false), (19, 1, 2, false),
-(3, 2, 4, false), (4, 2, 4, false),
-(5, 3, 3, false), (6, 3, 3, false), (3, 3, 3, false),
-(8, 4, 3, false), (20, 4, 2, false),
-(9, 5, 3, false), (14, 5, 2, false),
-(13, 6, 2, false), (18, 6, 2, false),
-(15, 7, 3, false), (16, 7, 3, false),
-(17, 8, 4, false), (18, 8, 3, false),
-(10, 9, 4, false), (1, 9, 2, false),
-(7, 10, 4, false), (20, 10, 2, false),
-(2, 11, 3, false), (19, 11, 2, false),
 (18, 12, 4, false),
-(1, 13, 3, false), (2, 13, 2, false), (3, 13, 3, false), (7, 13, 2, false),
-(9, 14, 3, false), (14, 14, 4, false), (13, 14, 2, false),
-(13, 15, 5, false), (14, 15, 4, false), (9, 15, 3, false),
-(3, 16, 4, false), (15, 16, 4, false), (16, 16, 3, false),
-(17, 17, 4, false), (18, 17, 4, false);
+(5, 18, 3, false),
+(6, 18, 3, false),
+(7, 19, 4, false),
+(20, 19, 2, false),
+(19, 20, 3, false);
 
 -- Training -> diplomas/certifications are now stored directly in public.training
-
--- Providers
-INSERT INTO public.provide (id_training, id_source, cost_hour, duration_hours, is_active) VALUES
-(1, 1, 85.00, 70.00, true), (1, 4, 45.00, 60.00, true),
-(2, 1, 90.00, 35.00, true), (2, 5, 110.00, 30.00, true),
-(3, 3, 55.00, 35.00, true), (3, 7, 0.00, 28.00, true),
-(4, 4, 50.00, 21.00, true), (4, 2, 75.00, 21.00, false),
-(5, 2, 70.00, 35.00, true),
-(6, 7, 0.00, 7.00, true),
-(7, 3, 60.00, 35.00, true),
-(8, 6, 95.00, 21.00, true),
-(9, 1, 88.00, 35.00, true),
-(10, 7, 0.00, 14.00, true),
-(11, 4, 48.00, 35.00, true),
-(12, 7, 0.00, 7.00, true),
-(13, 5, 75.00, 120.00, true),
-(14, 2, 80.00, 105.00, true),
-(15, 5, 120.00, 140.00, true),
-(16, 3, 90.00, 120.00, true),
-(17, 6, 95.00, 90.00, true);
 
 -- Employee diplomas
 INSERT INTO public.employeexdiploma (id_employee, id_diploma, end_, school, start_, distinction, doc, is_deleted) VALUES
@@ -254,6 +234,9 @@ VALUES
 (4, 1, 'COMPLETED', false),
 (4, 2, 'COMPLETED', false),
 (4, 3, 'COMPLETED', false),
+(4, 18, 'COMPLETED', false),
+(4, 19, 'COMPLETED', false),
+(4, 20, 'COMPLETED', false),
 
 (5, 1, 'COMPLETED', false),
 (5, 9, 'COMPLETED', false),
@@ -301,6 +284,9 @@ VALUES
 (1, 'VALIDATED', 'Backend onboarding', '2025-12-20', false, 4, 1, 2),
 (2, 'VALIDATED', 'Need stronger SQL', '2026-01-15', false, 4, 2, 2),
 (3, 'VALIDATED', 'ORM project need', '2026-01-30', false, 4, 3, 2),
+(15, 'VALIDATED', 'Direct SQLAlchemy practice', '2026-02-24', false, 4, 18, 2),
+(16, 'VALIDATED', 'Git and CI/CD upskilling', '2026-05-22', false, 4, 19, 2),
+(17, 'VALIDATED', 'Testing fundamentals', '2026-06-08', false, 4, 20, 2),
 
 (4, 'PENDING', 'API design improvement', '2026-05-01', false, 4, 9, NULL),
 

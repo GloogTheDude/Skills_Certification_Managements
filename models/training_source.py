@@ -9,10 +9,10 @@ class TrainingSource(Base):
     id_source: Mapped[int] = mapped_column(primary_key=True)
     name_source: Mapped[str | None] = mapped_column(String(50))
     is_deleted: Mapped[bool] = mapped_column(
-                                        Boolean,
-                                        default=False,
-                                        server_default="false",
-                                        nullable=False
-                                    )
+        Boolean,
+        default=False,
+        server_default="false",
+        nullable=False
+    )
 
-    provided_trainings = relationship("Provide", back_populates="source")
+    trainings = relationship("Training", back_populates="source")
