@@ -68,7 +68,8 @@ class RepositorySQLiteTestCase(unittest.TestCase):
         repo = EmployeeRepository(self.session)
         employee = Employee(first_name="Test", last_name="User", hash_password="hash", mail="test@company.be", id_role=1, id_manager=1, is_deleted=False)
 
-        repo.save(employee)
+        repo.add(employee)
+        self.session.flush()
         self.assertIsNotNone(employee.id_employee)
         self.assertEqual(repo.get_by_mail_with_access("test@company.be")[0].first_name, "Test")
 

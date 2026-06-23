@@ -111,3 +111,6 @@ class EmployeeRepository:
             Employee.is_deleted.is_(False)
         )
         return self.session.scalar(stmt)
+    
+    def delete(self, employee:Employee):
+        self.session.delete(employee)
