@@ -19,7 +19,7 @@ from controllers.skill_controller import SkillController
 from controllers.domaine_controller import DomaineController
 from controllers.diploma_controller import DiplomaController
 from controllers.employee_crud_controller import EmployeeCrudController
-
+from menus.crud_menu import CrudMenu
 class HRController():
     def __init__(self,hr: EmployeeDTO):
         self.hr = hr
@@ -64,21 +64,35 @@ class HRController():
                         close_expiration = service.get_close_to_expiration()
                     ecm.display_close_to_expiration(close_expiration)
                 case 8:
-                    #crud menu
-                    controller = TrainingSourceController()
-                    controller.main_menu()
-                    controller2 = SkillController()
-                    controller2.main_menu()
-                    controller3= DomaineController()
-                    controller3.main_menu()
-                    controller4 = DiplomaController()
-                    controller4.main_menu()
-                    controller5 = CertificationController()
-                    controller5.main_menu()
-                    controller6 = TrainingController()
-                    controller6.main_menu()
-                    controller7 = EmployeeCrudController()
-                    controller7.main_menu()
+                    user_choice_crud = -1
+                    while user_choice !=0:
+                        user_choice = CrudMenu.main_menu()
+                        match user_choice:
+                            case 1:
+                                controller = TrainingSourceController()
+                                controller.main_menu()
+                            case 2:
+                                controller2 = SkillController()
+                                controller2.main_menu()
+                            case 3:
+                                controller3= DomaineController()
+                                controller3.main_menu()
+                            case 4:
+                                controller4 = DiplomaController()
+                                controller4.main_menu()
+                            case 5:
+                                controller5 = CertificationController()
+                                controller5.main_menu()
+                            case 6:
+                                controller6 = TrainingController()
+                                controller6.main_menu()
+                            case 7:
+                                controller7 = EmployeeCrudController()
+                                controller7.main_menu()
+                            case 0:
+                                print("Back")
+                            case _: 
+                                print ("you shouldn't be here")
                 case 0:
                     return 
                 
