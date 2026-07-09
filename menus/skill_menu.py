@@ -18,7 +18,7 @@ class SkillMenu:
             user_choice = int(input("Your choice: "))
 
         return user_choice
-
+    @staticmethod
     def display_skills(skills: list[SkillCrudDTO]) -> None:
         print("===== SKILLS =====")
 

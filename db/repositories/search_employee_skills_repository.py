@@ -10,6 +10,7 @@ from models.employee_certification import EmployeeCertification
 from models.employee_diploma import EmployeeDiploma
 from models.participation import Participation
 from models.skill import Skill
+from models.skill_validation import SkillValidation
 from models.training import Training
 from models.training_skill import TrainingSkill
 
@@ -32,6 +33,7 @@ class SearchEmployeeSkillRepository:
         .join(Training, Training.id_training == Participation.id_training)
         .join(TrainingSkill, TrainingSkill.id_training == Training.id_training)
         .join(Skill, Skill.id_skill == TrainingSkill.id_skill)
+        .where(Employee.is_deleted is not None)
         )
 
         diploma_stmt = (
@@ -47,6 +49,7 @@ class SearchEmployeeSkillRepository:
             .join(Diploma, Diploma.id_diploma == EmployeeDiploma.id_diploma)
             .join(DiplomaSkill, DiplomaSkill.id_diploma == Diploma.id_diploma)
             .join(Skill, Skill.id_skill == DiplomaSkill.id_skill)
+            .where(Employee.is_deleted is not None)
             )   
 
         certification_stmt = (
@@ -62,13 +65,30 @@ class SearchEmployeeSkillRepository:
             .join(Certification, Certification.id_certification == EmployeeCertification.id_certification)
             .join(CertificationSkill, CertificationSkill.id_certification == Certification.id_certification)
             .join(Skill, Skill.id_skill == CertificationSkill.id_skill)
-            .where(EmployeeCertification.expiration > func.current_date())
-        )
+            .where(EmployeeCertification.expiration > func.current_date(),
+                   Employee.is_deleted is not None)
+            )
 
+
+        skill_validation_stmt =(
+            select(
+                Employee.id_employee,
+                Employee.first_name,
+                Employee.last_name,
+                Skill.id_skill,
+                Skill.name_skill,
+                SkillValidation.level_skill.label("level")
+            )
+            .join(SkillValidation, SkillValidation.id_employee == Employee.id_employee)
+            .join(Skill, Skill.id_skill == SkillValidation.id_skill)
+            .where(Employee.is_deleted is not None)
+        )
+        
         employee_skill_sources = union_all(
             training_stmt,
             diploma_stmt,
             certification_stmt,
+            skill_validation_stmt
         ).cte("employee_skill_sources")
 
         stmt = (
@@ -93,4 +113,4 @@ class SearchEmployeeSkillRepository:
             )
         )
 
-        result = self.session.execute(stmt).all()
+        return self.session.execute(stmt).all()
