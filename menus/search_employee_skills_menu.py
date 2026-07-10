@@ -33,7 +33,7 @@ class SearchEmployeeSkillsMenu():
                 case 2:
                     SearchEmployeeSkillsMenu.remove_from_filter(requisite)
                 case 3: 
-                    requisite = []
+                    requisite.clear()
                 case _:
                     print("invalid choice")
                                     
@@ -110,14 +110,15 @@ class SearchEmployeeSkillsMenu():
         requisite.append({"id":skill_choice,"op":op, "lvl":level})
 
 
-    def display_skills(skills: list[SkillCrudDTO], filter:dict) -> None:
+    def display_skills(skills: list[SkillCrudDTO], requisite:dict) -> None:
         print("===== SKILLS =====")
+        selected_skill_ids = [r["id"] for r in requisite]
         if not skills:
             print("No skill found.")
             return
         for skill in skills:
 
-            if not (skill.id_skill in filter): 
+            if not (skill.id_skill in selected_skill_ids): 
                 #domaine_name = skill.domaine_name or "No domain"
                 print(f"{skill.id_skill}: {skill.name_skill}")
 

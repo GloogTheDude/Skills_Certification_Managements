@@ -24,6 +24,5 @@ class SearchEmployeeSkillsController:
             repo = SkillRepository(session)
             service = SkillService(repo)
             skills = service.get_all_for_crud()
-        print(f"skills = {skills}")
         self.set_employees()
         sesm.main_menu(self.employees, self.requisite, skills)

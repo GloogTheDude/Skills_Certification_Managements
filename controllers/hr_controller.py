@@ -95,7 +95,6 @@ class HRController():
                             case _: 
                                 print ("you shouldn't be here")
                 case 9: 
-                    print("case 9!")
                     search_employee_skills_controller = SearchEmployeeSkillsController()
                     search_employee_skills_controller.main_menu()
                 case 0:
