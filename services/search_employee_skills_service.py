@@ -1,6 +1,6 @@
 
 from db.repositories.search_employee_skills_repository import SearchEmployeeSkillRepository
-from db.dto.search_employee_dto import SearchEmployeeDTO
+from dto.search_employee_dto import SearchEmployeeDTO
 
 
 class SearchEmployeeSkillsService:

@@ -33,7 +33,7 @@ class SearchEmployeeSkillRepository:
         .join(Training, Training.id_training == Participation.id_training)
         .join(TrainingSkill, TrainingSkill.id_training == Training.id_training)
         .join(Skill, Skill.id_skill == TrainingSkill.id_skill)
-        .where(Employee.is_deleted is not False)
+        .where(Employee.is_deleted.is_(False))
         )
 
         diploma_stmt = (
@@ -49,7 +49,7 @@ class SearchEmployeeSkillRepository:
             .join(Diploma, Diploma.id_diploma == EmployeeDiploma.id_diploma)
             .join(DiplomaSkill, DiplomaSkill.id_diploma == Diploma.id_diploma)
             .join(Skill, Skill.id_skill == DiplomaSkill.id_skill)
-            .where(Employee.is_deleted is not False)
+            .where(Employee.is_deleted.is_(False))
             )   
 
         certification_stmt = (
@@ -66,7 +66,7 @@ class SearchEmployeeSkillRepository:
             .join(CertificationSkill, CertificationSkill.id_certification == Certification.id_certification)
             .join(Skill, Skill.id_skill == CertificationSkill.id_skill)
             .where(EmployeeCertification.expiration > func.current_date(),
-                   Employee.is_deleted is not False)
+                   Employee.is_deleted.is_(False))
             )
 
 
@@ -81,7 +81,7 @@ class SearchEmployeeSkillRepository:
             )
             .join(SkillValidation, SkillValidation.id_employee == Employee.id_employee)
             .join(Skill, Skill.id_skill == SkillValidation.id_skill)
-            .where(Employee.is_deleted is not False)
+            .where(Employee.is_deleted.is_(False))
         )
         
         employee_skill_sources = union_all(
