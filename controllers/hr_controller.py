@@ -1,5 +1,6 @@
 from controllers.certification_controller import CertificationController
 from controllers.participation_controller import ParticipationController
+from controllers.search_employee_skills_controller import SearchEmployeeSkillsController
 from controllers.training_controller import TrainingController
 from core.database import SessionLocal
 from db.repositories.acquisition_skill_repository import AcquisitionSkillRepository
@@ -65,9 +66,9 @@ class HRController():
                     ecm.display_close_to_expiration(close_expiration)
                 case 8:
                     user_choice_crud = -1
-                    while user_choice !=0:
-                        user_choice = CrudMenu.main_menu()
-                        match user_choice:
+                    while user_choice_crud !=0:
+                        user_choice_crud = CrudMenu.main_menu()
+                        match user_choice_crud:
                             case 1:
                                 controller = TrainingSourceController()
                                 controller.main_menu()
@@ -93,7 +94,12 @@ class HRController():
                                 print("Back")
                             case _: 
                                 print ("you shouldn't be here")
+                case 9: 
+                    print("case 9!")
+                    search_employee_skills_controller = SearchEmployeeSkillsController()
+                    search_employee_skills_controller.main_menu()
                 case 0:
                     return 
-                
+                case _:
+                    print("error")
     

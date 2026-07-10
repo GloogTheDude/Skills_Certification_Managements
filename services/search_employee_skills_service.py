@@ -12,6 +12,8 @@ class SearchEmployeeSkillsService:
         result = self.repo_employee_skill.fetch_skills_employee()
         #print(f"result = {result}")
         #struc result: id_employee, first_name, last_name, id_skill, name_skill, level
+        #dict struct should be: 
+        #dict [id_skill]: [skill_name,level]
         for r in result:
             if r[0] in dict_dto.keys():
                 if r[3] not in dict_dto[r[0]].skills:

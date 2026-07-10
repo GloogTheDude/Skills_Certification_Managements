@@ -6,7 +6,7 @@ class HRMenu():
 
     def main_menu(self):
         user_choice =-1
-        while not(0<=user_choice<=8): 
+        while not(0<=user_choice<=9): 
             print("Here are your options:")
             print("1. See skills")
             print("2. See certifications")
@@ -16,6 +16,7 @@ class HRMenu():
             print("6. Participation Menu")
             print("7. Who's certification are about to expire")
             print("8. CRUD")
+            print("9. Search Employee with certain skills")
             print("0. Leave")
             user_choice = int(input("Your choice: "))
         return user_choice
